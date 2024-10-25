@@ -1,0 +1,265 @@
+{
+    "asset": {
+        "version": "2.0",
+        "generator": "Open Asset Import Library (assimp v5.4.0)"
+    },
+    "extensionsUsed": [
+        "KHR_materials_volume",
+        "FB_ngon_encoding"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 60,
+            "type": "VEC3",
+            "max": [
+                0.9807852506637573,
+                -1.0,
+                0.9238795042037964
+            ],
+            "min": [
+                -0.9807852506637573,
+                -2.0945990085601807,
+                -0.9238795042037964
+            ]
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 60,
+            "type": "VEC3",
+            "max": [
+                0.7080253958702087,
+                1.0,
+                0.652518630027771
+            ],
+            "min": [
+                -0.7080253958702087,
+                -0.6727240681648254,
+                -0.652518630027771
+            ]
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 60,
+            "type": "VEC2",
+            "max": [
+                0.9900000095367432,
+                0.9900000095367432
+            ],
+            "min": [
+                0.0625,
+                0.5
+            ]
+        },
+        {
+            "bufferView": 3,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 76,
+            "type": "SCALAR",
+            "max": [
+                59
+            ],
+            "min": [
+                0
+            ]
+        },
+        {
+            "bufferView": 4,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 404,
+            "type": "VEC3",
+            "max": [
+                1.0,
+                1.1590166091918945,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                -2.0945990085601807,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 5,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 404,
+            "type": "VEC3",
+            "max": [
+                0.9951865673065186,
+                1.0,
+                0.9951865673065186
+            ],
+            "min": [
+                -0.9951865673065186,
+                -0.6727271676063538,
+                -0.9951865673065186
+            ]
+        },
+        {
+            "bufferView": 6,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 404,
+            "type": "VEC2",
+            "max": [
+                1.0,
+                0.9900000095367432
+            ],
+            "min": [
+                0.0,
+                0.0
+            ]
+        },
+        {
+            "bufferView": 7,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 618,
+            "type": "SCALAR",
+            "max": [
+                403
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 17624,
+            "uri": "rakieta_0.bin"
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 720,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 720,
+            "byteLength": 720,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 1440,
+            "byteLength": 480,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 1920,
+            "byteLength": 304,
+            "target": 34963
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 2224,
+            "byteLength": 4848,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 7072,
+            "byteLength": 4848,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 11920,
+            "byteLength": 3232,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 15152,
+            "byteLength": 2472,
+            "target": 34963
+        }
+    ],
+    "materials": [
+        {
+            "name": "Mat_1"
+        }
+    ],
+    "meshes": [
+        {
+            "name": "meshes[0]",
+            "primitives": [
+                {
+                    "mode": 1,
+                    "material": 0,
+                    "indices": 3,
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1,
+                        "TEXCOORD_0": 2
+                    }
+                },
+                {
+                    "mode": 4,
+                    "material": 0,
+                    "indices": 7,
+                    "attributes": {
+                        "POSITION": 4,
+                        "NORMAL": 5,
+                        "TEXCOORD_0": 6
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "rakieta",
+            "children": [
+                1
+            ]
+        },
+        {
+            "name": "Cylinder",
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -4.023036694889015e-7,
+                2.9942479133605957,
+                0.0,
+                0.0,
+                -1.0000001192092896,
+                -1.3435885648505064e-7,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "mesh": 0,
+            "extras": {
+                "name": "Cylinder"
+            }
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "scene": 0
+}
