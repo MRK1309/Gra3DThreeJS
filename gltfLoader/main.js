@@ -2,24 +2,15 @@ import './style.css'
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { Sky } from 'three/examples/jsm/objects/Sky';
-import { MathUtils } from 'three';
-import { Vector3 } from 'three';
+import { createSky } from './sky';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
 //Sky
-const sky = new Sky();
-sky.scale.setScalar( 450000 );
+const sky = createSky();
+scene.add(sky);
 
-const phi = MathUtils.degToRad( 90 );
-const theta = MathUtils.degToRad( 180 );
-const sunPosition = new Vector3().setFromSphericalCoords( 1, phi, theta );
-
-sky.material.uniforms.sunPosition.value = sunPosition;
-
-scene.add( sky );
-//
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -27,6 +18,7 @@ document.body.appendChild( renderer.domElement );
 const gridHelper = new THREE.GridHelper(100,100);
 scene.add(gridHelper);
 
+//GLTFLoader
 const loader = new GLTFLoader();
 loader.load('/samolot.glb',function(gltf){
   scene.add(gltf.scene);
@@ -44,7 +36,9 @@ scene.add(spotLight.target);
 const spotLightHelper = new THREE.SpotLightHelper(spotLight);
 scene.add(spotLightHelper);
 
-camera.position.z = 5;
+camera.position.z = 20;
+camera.position.y = 10;
+camera.position.x = -10;
 
 const controls = new  OrbitControls(camera, renderer.domElement);
 
