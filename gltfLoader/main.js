@@ -4,9 +4,9 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { createSky } from './sky';
 import { fireProjectile } from './projectile';
 
-//Przygotowanie sceny
+// Przygotowanie sceny
 const scene = new THREE.Scene(); 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer(); 
 
 renderer.setSize(window.innerWidth, window.innerHeight); 
@@ -16,7 +16,7 @@ document.body.appendChild(renderer.domElement);
 const gridHelper = new THREE.GridHelper(100, 100);
 scene.add(gridHelper);
 
-//GLTFLoader - załadowanie modelu samolotu
+// GLTFLoader - załadowanie modelu samolotu
 const modelContainer = new THREE.Object3D();
 let myModel = new THREE.Object3D();
 const loader = new GLTFLoader();
@@ -26,14 +26,33 @@ loader.load('/samolot.glb', function(gltf) {
 });
 scene.add(modelContainer);
 
-//Sterowanie i renderowanie
+// Przeciwnik
+const opponentModelContainer = new THREE.Object3D();
+let opponentModel = new THREE.Object3D();
+let opponentHitCount = 0;
+
+loader.load('/samolot.glb', function(gltf) {
+    opponentModel = gltf.scene;
+    opponentModelContainer.add(opponentModel);
+    opponentModelContainer.position.z = modelContainer.position.z - 50;
+    opponentModelContainer.rotation.y = Math.PI;
+});
+scene.add(opponentModelContainer);
+
+// Sterowanie i renderowanie
 camera.position.z = modelContainer.position.z + 13;
 camera.position.y = 5;
 const controls = new PointerLockControls(modelContainer, renderer.domElement);
 document.body.addEventListener('click', function () { controls.lock(); }, false);
 modelContainer.attach(camera);
 
-//Pociski
+// Ograniczenie ruchu do osi Y w `PointerLockControls`
+controls.addEventListener('change', () => {
+    const euler = new THREE.Euler(0, controls.getObject().rotation.y, 0, 'YXZ');
+    controls.getObject().rotation.copy(euler);
+});
+
+// Pociski
 const projectiles = [];
 
 document.addEventListener("keydown", function(event) {
@@ -42,6 +61,7 @@ document.addEventListener("keydown", function(event) {
     }
 }, false);
 
+// Główna funkcja
 function animate() { 
     controls.moveForward(0.03);
 
@@ -50,6 +70,16 @@ function animate() {
         
         projectile.position.add(projectile.userData.velocity);
 
+        if (projectile.position.distanceTo(opponentModelContainer.position) < 1) {
+            opponentHitCount++;
+            scene.remove(projectile);
+            projectiles.splice(i, 1);
+
+            if (opponentHitCount >= 10) {
+                scene.remove(opponentModelContainer);
+            }
+            continue;
+        }
         if (projectile.position.distanceTo(modelContainer.position) > 100) {
             scene.remove(projectile);
             projectiles.splice(i, 1);
@@ -59,7 +89,7 @@ function animate() {
     renderer.render(scene, camera); 
 }
 
-//Latanie
+// Latanie
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     var keyCode = event.which;
@@ -68,7 +98,7 @@ function onDocumentKeyDown(event) {
     } 
 }
 
-//Niebo i światło
+// Niebo i światło
 const sky = createSky();
 scene.add(sky);
 
