@@ -39,7 +39,7 @@ loader.load('/samolot.glb', function (gltf) {
     opponentModelContainer.add(opponentModel);
     opponentModelContainer.position.z = modelContainer.position.z - 50;
     opponentModelContainer.rotation.y = Math.PI;
-    opponentBoundingBox.setFromObject(opponentModelContainer); // Ustawienie obwiedni modelu przeciwnika
+    opponentBoundingBox.setFromObject(opponentModelContainer);
 });
 scene.add(opponentModelContainer);
 
