@@ -43,7 +43,7 @@ loader.load('/samolot.glb', function (gltf) {
 });
 scene.add(opponentModelContainer);
 
-// Zmienne gry i funkcje obsługi klawiszy
+// Zmienne gry
 const projectiles = [];
 const speed = 0.125;
 let forward = false;
@@ -53,7 +53,7 @@ let fire = false;
 const cooldownTime = 5000;
 let lastTurnTime = 0;
 
-// Obsługa zdarzeń i wyświetlanie elementów UI
+// UI
 const blocker = document.getElementById('blocker');
 const instructions = document.getElementById('instructions');
 
@@ -73,7 +73,7 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
-// Funkcja kontroli klawiszy
+// Sterowanie
 document.addEventListener("keydown", onDocumentKeyDown, false);
 document.addEventListener("keyup", onDocumentKeyUp, false);
 
@@ -123,7 +123,6 @@ function animate() {
         if (left) controls.moveRight(-speed * 2);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
 
-        // Aktualizacja obwiedni przeciwnika w każdym klatce
         opponentBoundingBox.setFromObject(opponentModelContainer);
 
         // Aktualizacja pocisków i kolizji
@@ -131,7 +130,6 @@ function animate() {
             const projectile = projectiles[i];
             projectile.position.add(projectile.userData.velocity);
 
-            // Sprawdzenie kolizji między pociskiem a obwiednią przeciwnika
             if (opponentBoundingBox.containsPoint(projectile.position)) {
                 opponentHitCount++;
                 scene.remove(projectile);
@@ -152,7 +150,7 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// Dodanie nieba, światła i siatki pomocniczej
+// Niebo i światło
 const sky = createSky();
 scene.add(sky);
 
