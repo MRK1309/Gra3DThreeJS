@@ -55,6 +55,7 @@ function animate() {
 
         if (right){
             controls.moveRight(speed*2);
+            // modelContainer.rotateY(-speed/2)
         }
 
         if (left) {
@@ -110,9 +111,11 @@ function onDocumentKeyUp(event) {
     }
     if (keyCode === 68) { // D
         right = false;
+        lastTurnTime = currentTime; 
     }
     if (keyCode === 65) { // A
         left = false;
+        lastTurnTime = currentTime; 
     }
 }
 
