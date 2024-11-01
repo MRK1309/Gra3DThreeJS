@@ -3,6 +3,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { createSky } from './sky';
 import { fireProjectile } from './projectile';
+import { setupControls, getControlStates } from './controls';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -43,15 +44,39 @@ loader.load('/samolot.glb', function (gltf) {
 });
 scene.add(opponentModelContainer);
 
+// Rakieta
+let rocketModel;
+loader.load('/rakieta.glb', function (gltf) {
+    rocketModel = gltf.scene;
+});
+
+// Funkcja wystrzelenia rakiety
+function fireRocket() {
+    if (rocketModel) {
+        const rocket = rocketModel.clone();
+        rocket.position.copy(modelContainer.position);
+        rocket.rotation.copy(modelContainer.rotation);
+        
+        rocket.userData.velocity = new THREE.Vector3(0, 0, -1).applyQuaternion(modelContainer.quaternion).multiplyScalar(0.5);
+        
+        scene.add(rocket);
+        projectiles.push(rocket);
+    }
+}
+
+// Dodanie event listenera na klawisz Ctrl
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Shift') {
+        fireRocket();
+    }
+});
+
 // Zmienne gry
 const projectiles = [];
 const speed = 0.125;
-let forward = false;
-let right = false;
-let left = false;
-let fire = false;
-const cooldownTime = 5000;
-let lastTurnTime = 0;
+
+// Sterowanie (controls.js)
+setupControls();
 
 // UI
 const blocker = document.getElementById('blocker');
@@ -73,50 +98,11 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
-// Sterowanie
-document.addEventListener("keydown", onDocumentKeyDown, false);
-document.addEventListener("keyup", onDocumentKeyUp, false);
-
-function onDocumentKeyDown(event) {
-    const keyCode = event.which;
-    const currentTime = Date.now();
-
-    if (keyCode === 87) { // W
-        forward = true;
-    }
-    if (keyCode === 68 && currentTime - lastTurnTime > cooldownTime) { // D
-        right = true;
-        lastTurnTime = currentTime;
-    }
-    if (keyCode === 65 && currentTime - lastTurnTime > cooldownTime) { // A
-        left = true;
-        lastTurnTime = currentTime;
-    }
-    if (event.code === "Space") {
-        fire = true;
-    }
-}
-
-function onDocumentKeyUp(event) {
-    const keyCode = event.which;
-
-    if (keyCode === 87) { // W
-        forward = false;
-    }
-    if (keyCode === 68) { // D
-        right = false;
-    }
-    if (keyCode === 65) { // A
-        left = false;
-    }
-    if (event.code === "Space") {
-        fire = false;
-    }
-}
-
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
+        const { forward, right, left, fire } = getControlStates();
+
         controls.moveForward(speed / 2);
         if (forward) controls.moveForward(speed);
         if (right) controls.moveRight(speed * 2);
