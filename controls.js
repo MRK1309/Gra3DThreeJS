@@ -1,4 +1,3 @@
-// controls.js
 let forward = false;
 let right = false;
 let left = false;
@@ -19,12 +18,16 @@ function onDocumentKeyDown(event) {
         forward = true;
     }
     if (keyCode === 68 && currentTime - lastTurnTime > cooldownTime) { // D
-        right = true;
-        lastTurnTime = currentTime;
+        if (!right){
+            right = true;
+            lastTurnTime = currentTime;
+        }
     }
-    if (keyCode === 65 && currentTime - lastTurnTime > cooldownTime) { // A
-        left = true;
-        lastTurnTime = currentTime;
+    if (keyCode === 65 && currentTime - lastTurnTime > cooldownTime) { // D
+        if (!left){
+            left = true;
+            lastTurnTime = currentTime;
+        }
     }
     if (event.code === "Space") {
         fire = true;
@@ -49,5 +52,9 @@ function onDocumentKeyUp(event) {
 }
 
 export function getControlStates() {
-    return { forward, right, left, fire };
+    const currentState = { forward, right, left, fire };
+    forward = false;
+    right = false;
+    left = false;
+    return currentState;
 }
