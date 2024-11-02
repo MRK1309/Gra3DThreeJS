@@ -64,7 +64,7 @@ function fireRocket() {
     }
 }
 
-// Dodanie event listenera na klawisz Ctrl
+// Dodanie event listenera na klawisz Shift
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Shift') {
         fireRocket();
@@ -90,13 +90,29 @@ document.body.addEventListener('click', function () {
 
 controls.addEventListener('unlock', function () {
     blocker.style.display = 'block';
-    instructions.style.display = 'block';
+    instructions.style.display = '';
 });
 
 controls.addEventListener('change', () => {
     const euler = new THREE.Euler(0, controls.object.rotation.y, 0, 'YXZ');
     controls.object.rotation.copy(euler);
 });
+
+// Funkcja uniku
+function dodge(speed) {
+    const duration = 500;
+    const startTime = Date.now();
+
+    const interval = setInterval(() => {
+        const elapsedTime = Date.now() - startTime;
+        
+        controls.moveRight(speed);
+
+        if (elapsedTime >= duration) {
+            clearInterval(interval); // Zatrzymaj interwał
+        }
+    }, 1);
+}
 
 // Główna funkcja animacji
 function animate() {
@@ -105,8 +121,8 @@ function animate() {
 
         controls.moveForward(speed / 2);
         if (forward) controls.moveForward(speed);
-        if (right) controls.moveRight(speed * 2);
-        if (left) controls.moveRight(-speed * 2);
+        if (right) dodge(speed * 2);
+        if (left) dodge(-speed * 2);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
 
         opponentBoundingBox.setFromObject(opponentModelContainer);
