@@ -119,8 +119,8 @@ function animate() {
     if (controls.isLocked) {
         const { forward, right, left, fire } = getControlStates();
 
-        controls.moveForward(speed / 2);
-        if (forward) controls.moveForward(speed);
+        controls.moveForward(speed);
+        if (forward) controls.moveForward(speed*2);
         if (right) dodge(speed * 2);
         if (left) dodge(-speed * 2);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
