@@ -53,8 +53,8 @@ function onDocumentKeyUp(event) {
 
 export function getControlStates() {
     const currentState = { forward, right, left, fire };
-    forward = false;
     right = false;
     left = false;
+    fire = false;
     return currentState;
 }
