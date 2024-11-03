@@ -33,6 +33,7 @@ scene.add(modelContainer);
 const opponentModelContainer = new THREE.Object3D();
 let opponentModel = new THREE.Object3D();
 let opponentHitCount = 0;
+let opponentRocketHitCount = 0;
 let opponentBoundingBox = new THREE.Box3();
 
 loader.load('/samolot.glb', function (gltf) {
@@ -57,12 +58,18 @@ function fireRocket() {
         rocket.position.copy(modelContainer.position);
         rocket.rotation.copy(modelContainer.rotation);
         
-        rocket.userData.velocity = new THREE.Vector3(0, 0, -1).applyQuaternion(modelContainer.quaternion).multiplyScalar(0.5);
+        rocket.scale.set(0.25, 0.25, 0.25);
+        
+        rocket.userData = {
+            velocity: new THREE.Vector3(0, 0, -1).applyQuaternion(modelContainer.quaternion).multiplyScalar(0.5),
+            type: 'rocket'
+        };
         
         scene.add(rocket);
         projectiles.push(rocket);
     }
 }
+
 
 // Dodanie event listenera na klawisz Shift
 document.addEventListener('keydown', (event) => {
@@ -109,7 +116,7 @@ function dodge(speed) {
         controls.moveRight(speed);
 
         if (elapsedTime >= duration) {
-            clearInterval(interval); // Zatrzymaj interwał
+            clearInterval(interval);
         }
     }, 1);
 }
@@ -133,11 +140,16 @@ function animate() {
             projectile.position.add(projectile.userData.velocity);
 
             if (opponentBoundingBox.containsPoint(projectile.position)) {
-                opponentHitCount++;
+                if (projectile.userData.type === 'rocket') {
+                    opponentRocketHitCount++; 
+                } else {
+                    opponentHitCount++;
+                }
+                
                 scene.remove(projectile);
                 projectiles.splice(i, 1);
 
-                if (opponentHitCount >= 10) {
+                if (opponentHitCount >= 10 || opponentRocketHitCount >= 2) {
                     scene.remove(opponentModelContainer);
                 }
                 continue;
