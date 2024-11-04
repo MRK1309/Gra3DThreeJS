@@ -51,6 +51,22 @@ function onDocumentKeyUp(event) {
     }
 }
 
+// Funkcja uniku
+export function dodge(speed, controls) {
+    const duration = 500;
+    const startTime = Date.now();
+
+    const interval = setInterval(() => {
+        const elapsedTime = Date.now() - startTime;
+        
+        controls.moveRight(speed);
+
+        if (elapsedTime >= duration) {
+            clearInterval(interval);
+        }
+    }, 1);
+}
+
 export function getControlStates() {
     const currentState = { forward, right, left, fire };
     right = false;
