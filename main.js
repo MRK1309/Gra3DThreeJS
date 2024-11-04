@@ -3,7 +3,7 @@ import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockCont
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { createSky } from './sky';
 import { fireProjectile } from './projectile';
-import { setupControls, getControlStates } from './controls';
+import { dodge, setupControls, getControlStates } from './controls';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -105,21 +105,7 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
-// Funkcja uniku
-function dodge(speed) {
-    const duration = 500;
-    const startTime = Date.now();
 
-    const interval = setInterval(() => {
-        const elapsedTime = Date.now() - startTime;
-        
-        controls.moveRight(speed);
-
-        if (elapsedTime >= duration) {
-            clearInterval(interval);
-        }
-    }, 1);
-}
 
 // Główna funkcja animacji
 function animate() {
@@ -128,8 +114,8 @@ function animate() {
 
         controls.moveForward(speed);
         if (forward) controls.moveForward(speed*2);
-        if (right) dodge(speed * 2);
-        if (left) dodge(-speed * 2);
+        if (right) dodge(speed * 2, controls);
+        if (left) dodge(-speed * 2, controls);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
 
         opponentBoundingBox.setFromObject(opponentModelContainer);
