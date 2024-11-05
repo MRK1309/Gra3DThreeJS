@@ -38,9 +38,9 @@ let opponentBoundingBox = new THREE.Box3();
 
 loader.load('/samolot.glb', function (gltf) {
     opponentModel = gltf.scene;
+    opponentModel.rotation.y = Math.PI
     opponentModelContainer.add(opponentModel);
     opponentModelContainer.position.z = modelContainer.position.z - 50;
-    opponentModelContainer.rotation.y = Math.PI;
     opponentBoundingBox.setFromObject(opponentModelContainer);
 });
 scene.add(opponentModelContainer);
@@ -69,7 +69,6 @@ function fireRocket() {
         projectiles.push(rocket);
     }
 }
-
 
 // Dodanie event listenera na klawisz Shift
 document.addEventListener('keydown', (event) => {
@@ -105,11 +104,23 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
+// Funkcja śledzenia samolotu
+function follow(opponent){
+    const modelPosition = new THREE.Vector3();
+    modelContainer.getWorldPosition(modelPosition);  
 
+    opponent.lookAt(modelPosition);
+
+    const offset = 0.2; 
+    const v = new THREE.Vector3(0, 0, 1).applyQuaternion(opponent.quaternion);
+    opponent.position.add(v.multiplyScalar(offset));
+}
 
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
+        follow(opponentModelContainer)
+
         const { forward, right, left, fire } = getControlStates();
 
         controls.moveForward(speed);
