@@ -56,14 +56,18 @@ function fireRocket() {
     if (rocketModel) {
         const rocket = rocketModel.clone();
         rocket.position.copy(modelContainer.position);
-        rocket.rotation.copy(modelContainer.rotation);
-        
         rocket.scale.set(0.25, 0.25, 0.25);
-        
+
+        const opponentPosition = new THREE.Vector3();
+        opponentModelContainer.getWorldPosition(opponentPosition);
+        const directionToOpponent = new THREE.Vector3().subVectors(opponentPosition, rocket.position).normalize();
+
         rocket.userData = {
-            velocity: new THREE.Vector3(0, 0, -1).applyQuaternion(modelContainer.quaternion).multiplyScalar(0.5),
+            velocity: directionToOpponent.multiplyScalar(0.5),
             type: 'rocket'
         };
+
+        rocket.lookAt(opponentPosition);
         
         scene.add(rocket);
         projectiles.push(rocket);
@@ -119,12 +123,12 @@ function follow(opponent){
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
-        follow(opponentModelContainer)
+        follow(opponentModelContainer);
 
         const { forward, right, left, fire } = getControlStates();
 
         controls.moveForward(speed);
-        if (forward) controls.moveForward(speed*2);
+        if (forward) controls.moveForward(speed * 2);
         if (right) dodge(speed * 2, controls);
         if (left) dodge(-speed * 2, controls);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
@@ -136,13 +140,19 @@ function animate() {
             const projectile = projectiles[i];
             projectile.position.add(projectile.userData.velocity);
 
+            if (projectile.userData.type === 'rocket') {
+                const opponentPosition = new THREE.Vector3();
+                opponentModelContainer.getWorldPosition(opponentPosition);
+                projectile.lookAt(opponentPosition);
+            }
+
             if (opponentBoundingBox.containsPoint(projectile.position)) {
                 if (projectile.userData.type === 'rocket') {
-                    opponentRocketHitCount++; 
+                    opponentRocketHitCount++;
                 } else {
                     opponentHitCount++;
                 }
-                
+
                 scene.remove(projectile);
                 projectiles.splice(i, 1);
 
