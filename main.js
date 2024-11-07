@@ -46,15 +46,18 @@ loader.load('/samolot.glb', function (gltf) {
 scene.add(opponentModelContainer);
 
 // Rakieta
-let rocketModel;
+const rocketContainer = new THREE.Object3D();
+let rocketModel = new THREE.Object3D();
 loader.load('/rakieta.glb', function (gltf) {
     rocketModel = gltf.scene;
+    rocketModel.rotation.y = Math.PI
+    rocketContainer.add(rocketModel)
 });
 
 // Funkcja wystrzelenia rakiety
 function fireRocket() {
-    if (rocketModel) {
-        const rocket = rocketModel.clone();
+    if (rocketContainer) {
+        const rocket = rocketContainer.clone();
         rocket.position.copy(modelContainer.position);
         rocket.scale.set(0.25, 0.25, 0.25);
 
@@ -113,22 +116,34 @@ function follow(opponent){
     const modelPosition = new THREE.Vector3();
     modelContainer.getWorldPosition(modelPosition);  
 
-    opponent.lookAt(modelPosition);
+    const directionToModel = new THREE.Vector3().subVectors(modelPosition, opponent.position).normalize();
+    const distanceToModel = modelPosition.distanceTo(opponent.position);
 
-    const offset = 0.2; 
-    const v = new THREE.Vector3(0, 0, 1).applyQuaternion(opponent.quaternion);
-    opponent.position.add(v.multiplyScalar(offset));
+    const offset = 0.1;
+    if (distanceToModel > 20) {
+        opponent.position.add(directionToModel.multiplyScalar(offset));
+    } 
+    else {
+        const oppositeDirection = directionToModel.negate(); 
+        opponent.position.add(oppositeDirection.multiplyScalar(offset));
+    }
+
+    const turnSpeed = 0.1;  
+    const currentRotation = opponent.rotation.y; 
+    const targetRotation = Math.atan2(directionToModel.x, directionToModel.z); 
+
+    opponent.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
 }
 
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
-        follow(opponentModelContainer);
+        follow(opponentModelContainer)
 
         const { forward, right, left, fire } = getControlStates();
 
         controls.moveForward(speed);
-        if (forward) controls.moveForward(speed * 2);
+        if (forward) controls.moveForward(speed*2);
         if (right) dodge(speed * 2, controls);
         if (left) dodge(-speed * 2, controls);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
@@ -140,19 +155,13 @@ function animate() {
             const projectile = projectiles[i];
             projectile.position.add(projectile.userData.velocity);
 
-            if (projectile.userData.type === 'rocket') {
-                const opponentPosition = new THREE.Vector3();
-                opponentModelContainer.getWorldPosition(opponentPosition);
-                projectile.lookAt(opponentPosition);
-            }
-
             if (opponentBoundingBox.containsPoint(projectile.position)) {
                 if (projectile.userData.type === 'rocket') {
-                    opponentRocketHitCount++;
+                    opponentRocketHitCount++; 
                 } else {
                     opponentHitCount++;
                 }
-
+                
                 scene.remove(projectile);
                 projectiles.splice(i, 1);
 
