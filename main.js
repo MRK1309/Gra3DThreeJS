@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { createSky } from './sky';
-import { fireProjectile } from './projectile';
+import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
 
 // Przygotowanie sceny
@@ -65,13 +65,20 @@ function fireRocket() {
         opponentModelContainer.getWorldPosition(opponentPosition);
         const directionToOpponent = new THREE.Vector3().subVectors(opponentPosition, rocket.position).normalize();
 
-        rocket.userData = {
-            velocity: directionToOpponent.multiplyScalar(0.5),
-            type: 'rocket'
-        };
-
-        rocket.lookAt(opponentPosition);
-        
+        if(scene.children.includes(opponentModelContainer)){
+            rocket.userData = {
+                velocity: directionToOpponent.multiplyScalar(0.5),
+                type: 'rocket'
+            };
+            rocket.lookAt(opponentPosition);
+        }   
+        else{
+            rocket.userData = {
+                velocity: new THREE.Vector3(0, 0, -1).applyQuaternion(modelContainer.quaternion).multiplyScalar(0.5),
+                type: 'rocket'
+            };
+            rocket.rotation.copy(modelContainer.rotation);
+        }       
         scene.add(rocket);
         projectiles.push(rocket);
     }
@@ -87,6 +94,7 @@ document.addEventListener('keydown', (event) => {
 // Zmienne gry
 const projectiles = [];
 const speed = 0.125;
+const opponentProjectiles = [];
 
 // Sterowanie (controls.js)
 setupControls();
@@ -135,10 +143,17 @@ function follow(opponent){
     opponent.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
 }
 
+
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
         follow(opponentModelContainer)
+        if(scene.children.includes(opponentModelContainer))
+            opponentFire(scene, opponentModelContainer, opponentProjectiles)
+        for (let i = opponentProjectiles.length - 1; i >= 0; i--) {
+            const projectile = opponentProjectiles[i];
+            projectile.position.add(projectile.userData.velocity);
+        }
 
         const { forward, right, left, fire } = getControlStates();
 
@@ -155,27 +170,30 @@ function animate() {
             const projectile = projectiles[i];
             projectile.position.add(projectile.userData.velocity);
 
-            if (opponentBoundingBox.containsPoint(projectile.position)) {
-                if (projectile.userData.type === 'rocket') {
-                    opponentRocketHitCount++; 
-                } else {
-                    opponentHitCount++;
-                }
-                
-                scene.remove(projectile);
-                projectiles.splice(i, 1);
+            if(scene.children.includes(opponentModelContainer)){
+                if (opponentBoundingBox.containsPoint(projectile.position)) {
+                    if (projectile.userData.type === 'rocket') {
+                        opponentRocketHitCount++; 
+                    } else {
+                        opponentHitCount++;
+                    }
 
-                if (opponentHitCount >= 10 || opponentRocketHitCount >= 2) {
-                    scene.remove(opponentModelContainer);
+                    scene.remove(projectile);
+                    projectiles.splice(i, 1);
+
+                    if (opponentHitCount >= 10 || opponentRocketHitCount >= 2) {
+                        scene.remove(opponentModelContainer);
+                    }
+                    continue;
                 }
-                continue;
             }
 
             if (projectile.position.distanceTo(modelContainer.position) > 100) {
                 scene.remove(projectile);
                 projectiles.splice(i, 1);
             }
-        }
+        
+    }
     }
     renderer.render(scene, camera);
 }
