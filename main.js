@@ -147,14 +147,6 @@ function follow(opponent){
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
-        follow(opponentModelContainer)
-        if(scene.children.includes(opponentModelContainer))
-            opponentFire(scene, opponentModelContainer, opponentProjectiles)
-        for (let i = opponentProjectiles.length - 1; i >= 0; i--) {
-            const projectile = opponentProjectiles[i];
-            projectile.position.add(projectile.userData.velocity);
-        }
-
         const { forward, right, left, fire } = getControlStates();
 
         controls.moveForward(speed);
@@ -192,8 +184,25 @@ function animate() {
                 scene.remove(projectile);
                 projectiles.splice(i, 1);
             }
-        
-    }
+        }
+
+        //przeciwnik
+        follow(opponentModelContainer)
+
+        if(scene.children.includes(opponentModelContainer)){
+            if(opponentModelContainer.position.distanceTo(modelContainer.position) < 50 && opponentModelContainer.position.distanceTo(modelContainer.position) > 20)
+                opponentFire(scene, opponentModelContainer, opponentProjectiles)
+        }
+
+        for (let i = opponentProjectiles.length - 1; i >= 0; i--) {
+            const oprojectile = opponentProjectiles[i];
+            oprojectile.position.add(oprojectile.userData.velocity);
+
+            if (oprojectile.position.distanceTo(modelContainer.position) > 100) {
+                scene.remove(oprojectile);
+                opponentProjectiles.splice(i, 1);
+            }
+        }
     }
     renderer.render(scene, camera);
 }
