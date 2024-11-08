@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { createSky } from './sky';
 import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
+import { fireRocket } from './rocket';
+import { opponentFollow } from './opponent';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -54,43 +56,6 @@ loader.load('/rakieta.glb', function (gltf) {
     rocketContainer.add(rocketModel)
 });
 
-// Funkcja wystrzelenia rakiety
-function fireRocket() {
-    if (rocketContainer) {
-        const rocket = rocketContainer.clone();
-        rocket.position.copy(modelContainer.position);
-        rocket.scale.set(0.25, 0.25, 0.25);
-
-        const opponentPosition = new THREE.Vector3();
-        opponentModelContainer.getWorldPosition(opponentPosition);
-        const directionToOpponent = new THREE.Vector3().subVectors(opponentPosition, rocket.position).normalize();
-
-        if(scene.children.includes(opponentModelContainer)){
-            rocket.userData = {
-                velocity: directionToOpponent.multiplyScalar(0.5),
-                type: 'rocket'
-            };
-            rocket.lookAt(opponentPosition);
-        }   
-        else{
-            rocket.userData = {
-                velocity: new THREE.Vector3(0, 0, -1).applyQuaternion(modelContainer.quaternion).multiplyScalar(0.5),
-                type: 'rocket'
-            };
-            rocket.rotation.copy(modelContainer.rotation);
-        }       
-        scene.add(rocket);
-        projectiles.push(rocket);
-    }
-}
-
-// Dodanie event listenera na klawisz Shift
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Shift') {
-        fireRocket();
-    }
-});
-
 // Zmienne gry
 const projectiles = [];
 const speed = 0.125;
@@ -119,41 +84,17 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
-// Funkcja śledzenia samolotu
-function follow(opponent){
-    const modelPosition = new THREE.Vector3();
-    modelContainer.getWorldPosition(modelPosition);  
-
-    const directionToModel = new THREE.Vector3().subVectors(modelPosition, opponent.position).normalize();
-    const distanceToModel = modelPosition.distanceTo(opponent.position);
-
-    const offset = 0.1;
-    if (distanceToModel > 20) {
-        opponent.position.add(directionToModel.multiplyScalar(offset));
-    } 
-    else {
-        const oppositeDirection = directionToModel.negate(); 
-        opponent.position.add(oppositeDirection.multiplyScalar(offset));
-    }
-
-    const turnSpeed = 0.1;  
-    const currentRotation = opponent.rotation.y; 
-    const targetRotation = Math.atan2(directionToModel.x, directionToModel.z); 
-
-    opponent.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
-}
-
-
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
-        const { forward, right, left, fire } = getControlStates();
+        const { forward, right, left, fire, rocket } = getControlStates();
 
         controls.moveForward(speed);
         if (forward) controls.moveForward(speed*2);
         if (right) dodge(speed * 2, controls);
         if (left) dodge(-speed * 2, controls);
         if (fire) fireProjectile(scene, modelContainer, projectiles);
+        if (rocket) fireRocket(scene, rocketContainer, modelContainer, opponentModelContainer, projectiles);
 
         opponentBoundingBox.setFromObject(opponentModelContainer);
 
@@ -187,7 +128,7 @@ function animate() {
         }
 
         //przeciwnik
-        follow(opponentModelContainer)
+        opponentFollow(opponentModelContainer, modelContainer)
 
         if(scene.children.includes(opponentModelContainer)){
             if(opponentModelContainer.position.distanceTo(modelContainer.position) < 50 && opponentModelContainer.position.distanceTo(modelContainer.position) > 20)
