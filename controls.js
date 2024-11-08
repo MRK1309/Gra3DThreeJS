@@ -2,6 +2,7 @@ let forward = false;
 let right = false;
 let left = false;
 let fire = false;
+let rocket = false;
 const cooldownTime = 5000;
 let lastTurnTime = 0;
 
@@ -32,6 +33,9 @@ function onDocumentKeyDown(event) {
     if (event.code === "Space") {
         fire = true;
     }
+    if (event.key === 'Shift') {
+        rocket = true;
+    }
 }
 
 function onDocumentKeyUp(event) {
@@ -48,6 +52,9 @@ function onDocumentKeyUp(event) {
     }
     if (event.code === "Space") {
         fire = false;
+    }
+    if (event.key === 'Shift') {
+        rocket = false;
     }
 }
 
@@ -68,9 +75,10 @@ export function dodge(speed, controls) {
 }
 
 export function getControlStates() {
-    const currentState = { forward, right, left, fire };
+    const currentState = { forward, right, left, fire, rocket };
     right = false;
     left = false;
     fire = false;
+    rocket = false;
     return currentState;
 }
