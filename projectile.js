@@ -19,6 +19,8 @@ export function fireProjectile(scene, modelContainer, projectiles) {
 }
 
 export function opponentFire(scene, modelContainer, projectiles) {
+    if (projectiles.length >= 1) return;
+
     const geometry = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
     const material = new THREE.MeshBasicMaterial({ color: 0xAE243B });
     const projectile = new THREE.Mesh(geometry, material);
