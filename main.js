@@ -30,6 +30,8 @@ loader.load('/samolot.glb', function (gltf) {
     modelContainer.add(myModel);
 });
 scene.add(modelContainer);
+let playerBoundingBox = new THREE.Box3();
+let health = 20;
 
 // Przeciwnik
 const opponentModelContainer = new THREE.Object3D();
@@ -84,6 +86,11 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
+// Baaardzo wstępny obiekt uderzenia
+const geometry = new THREE.CircleGeometry(1, 32);
+const material = new THREE.MeshBasicMaterial({color: 0xffff00});
+const hit = new THREE.Mesh(geometry, material);
+
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
@@ -96,6 +103,7 @@ function animate() {
         if (fire) fireProjectile(scene, modelContainer, projectiles);
         if (rocket) fireRocket(scene, rocketContainer, modelContainer, opponentModelContainer, projectiles);
 
+        playerBoundingBox.setFromObject(modelContainer);
         opponentBoundingBox.setFromObject(opponentModelContainer);
 
         // Aktualizacja pocisków i kolizji
@@ -138,6 +146,25 @@ function animate() {
         for (let i = opponentProjectiles.length - 1; i >= 0; i--) {
             const oprojectile = opponentProjectiles[i];
             oprojectile.position.add(oprojectile.userData.velocity);
+
+            if (playerBoundingBox.containsPoint(oprojectile.position)) {
+                hit.position.copy(modelContainer.position)
+                hit.rotation.copy(modelContainer.rotation)
+                scene.add(hit);
+
+                health--;
+                console.log(health)
+
+                scene.remove(oprojectile);
+                opponentProjectiles.splice(i, 1);
+
+                if (health < 0) {
+                    scene.remove(modelContainer); //to tak na razie dla testów xd
+                }
+                continue;
+            }
+
+            scene.remove(hit)
 
             if (oprojectile.position.distanceTo(modelContainer.position) > 100) {
                 scene.remove(oprojectile);
