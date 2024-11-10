@@ -91,6 +91,9 @@ const geometry = new THREE.CircleGeometry(1, 32);
 const material = new THREE.MeshBasicMaterial({color: 0xffff00});
 const hit = new THREE.Mesh(geometry, material);
 
+//Pasek życia
+const healthBar = document.getElementById('health-bar');
+
 // Główna funkcja animacji
 function animate() {
     if (controls.isLocked) {
@@ -155,11 +158,15 @@ function animate() {
                 health--;
                 console.log(health)
 
+                // Aktualizacja paska życia na podstawie zdrowia
+                const healthPercentage = Math.max((health / 20) * 100, 0); // Obliczenie procentowego zdrowia
+                healthBar.style.width = `${healthPercentage}%`; // Zmiana szerokości paska zdrowia
+
                 scene.remove(oprojectile);
                 opponentProjectiles.splice(i, 1);
 
                 if (health < 0) {
-                    scene.remove(modelContainer); //to tak na razie dla testów xd
+                    scene.remove(modelContainer); // Testowe usunięcie samolotu
                 }
                 continue;
             }
