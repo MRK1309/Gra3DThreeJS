@@ -6,6 +6,7 @@ import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
 import { fireRocket } from './rocket';
 import { opponentFollow } from './opponent';
+import { Water } from 'three/examples/jsm/objects/Water.js';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -179,6 +180,9 @@ function animate() {
             }
         }
     }
+
+    water.material.uniforms['time'].value += 1.0 / 60.0;
+
     renderer.render(scene, camera);
 }
 
@@ -198,5 +202,26 @@ scene.add(spotLight.target);
 const spotLightHelper = new THREE.SpotLightHelper(spotLight);
 scene.add(spotLightHelper);
 
-const gridHelper = new THREE.GridHelper(100, 100);
-scene.add(gridHelper);
+// const gridHelper = new THREE.GridHelper(100, 100);
+// scene.add(gridHelper);
+
+// Woda
+
+const geometry2 = new THREE.PlaneGeometry(10000, 10000);
+
+const waterNormals = new THREE.TextureLoader().load('/waternormals.jpg');
+waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
+
+const water = new Water(geometry2, {
+  textureWidth: 512,
+  textureHeight: 512,
+  waterNormals: waterNormals,
+  sunDirection: new THREE.Vector3(),
+  sunColor: 0xffffff,
+  waterColor: 0x001e0f,
+  distortionScale: 3.7,
+});
+
+water.position.y = -10;
+water.rotation.x = Math.PI * - 0.5;
+scene.add(water);
