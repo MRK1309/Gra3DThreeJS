@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { createSky } from './sky';
+import { createSky, createWater } from './environment';
 import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
 import { fireRocket } from './rocket';
 import { opponentFollow } from './opponent';
-import { Water } from 'three/examples/jsm/objects/Water.js';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -70,16 +69,23 @@ setupControls();
 // UI
 const blocker = document.getElementById('blocker');
 const instructions = document.getElementById('instructions');
+//Pasek życia
+const healthBar = document.getElementById('health-bar');
+const healthBarContainer = document.getElementById('health-bar-container');
 
 document.body.addEventListener('click', function () {
     instructions.style.display = 'none';
     blocker.style.display = 'none';
+    healthBar.style.display = 'block'
+    healthBarContainer.style.display = 'block'
     controls.lock();
 }, false);
 
 controls.addEventListener('unlock', function () {
     blocker.style.display = 'block';
     instructions.style.display = '';
+    healthBar.style.display = 'none'
+    healthBarContainer.style.display = 'none'
 });
 
 controls.addEventListener('change', () => {
@@ -87,13 +93,11 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
+
 // Baaardzo wstępny obiekt uderzenia
 const geometry = new THREE.CircleGeometry(1, 32);
 const material = new THREE.MeshBasicMaterial({color: 0xffff00});
 const hit = new THREE.Mesh(geometry, material);
-
-//Pasek życia
-const healthBar = document.getElementById('health-bar');
 
 // Główna funkcja animacji
 function animate() {
@@ -157,7 +161,6 @@ function animate() {
                 scene.add(hit);
 
                 health--;
-                console.log(health)
 
                 // Aktualizacja paska życia na podstawie zdrowia
                 const healthPercentage = Math.max((health / 20) * 100, 0); // Obliczenie procentowego zdrowia
@@ -179,12 +182,15 @@ function animate() {
                 opponentProjectiles.splice(i, 1);
             }
         }
+
+        water.material.uniforms['time'].value += 1.0 / 60.0;
     }
-
-    water.material.uniforms['time'].value += 1.0 / 60.0;
-
     renderer.render(scene, camera);
 }
+
+// Woda
+const water = createWater();
+scene.add(water);
 
 // Niebo i światło
 const sky = createSky();
@@ -204,24 +210,3 @@ scene.add(spotLightHelper);
 
 // const gridHelper = new THREE.GridHelper(100, 100);
 // scene.add(gridHelper);
-
-// Woda
-
-const geometry2 = new THREE.PlaneGeometry(10000, 10000);
-
-const waterNormals = new THREE.TextureLoader().load('/waternormals.jpg');
-waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
-
-const water = new Water(geometry2, {
-  textureWidth: 512,
-  textureHeight: 512,
-  waterNormals: waterNormals,
-  sunDirection: new THREE.Vector3(),
-  sunColor: 0xffffff,
-  waterColor: 0x001e0f,
-  distortionScale: 3.7,
-});
-
-water.position.y = -10;
-water.rotation.x = Math.PI * - 0.5;
-scene.add(water);
