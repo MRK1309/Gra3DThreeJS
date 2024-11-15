@@ -4,8 +4,8 @@ let availableRockets = 2;
 
 // Funkcja aktualizująca widoczność ikon rakiet
 function updateRocketIcons() {
-    rocket2 = document.getElementById('rocket2')
-    rocket1 = document.getElementById('rocket1')
+    const rocket2 = document.getElementById('rocket2')
+    const rocket1 = document.getElementById('rocket1')
 
     if (availableRockets === 1) {
         rocket2.src = "public/rocket_locked.png"
