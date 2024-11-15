@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { setupInterface, updateBars } from './interface';
 import { createSky, createWater } from './environment';
 import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
-import { fireRocket } from './rocket';
+import { fireRocket} from './rocket';
 import { opponentFollow } from './opponent';
 
 // Przygotowanie sceny
@@ -22,6 +23,11 @@ const modelContainer = new THREE.Object3D();
 const controls = new PointerLockControls(modelContainer, renderer.domElement);
 modelContainer.attach(camera);
 
+controls.addEventListener('change', () => {
+    const euler = new THREE.Euler(0, controls.object.rotation.y, 0, 'YXZ');
+    controls.object.rotation.copy(euler);
+});
+
 // GLTFLoader - załadowanie modelu samolotu
 let myModel = new THREE.Object3D();
 const loader = new GLTFLoader();
@@ -31,7 +37,6 @@ loader.load('/samolot.glb', function (gltf) {
 });
 scene.add(modelContainer);
 let playerBoundingBox = new THREE.Box3();
-
 
 // Przeciwnik
 const opponentModelContainer = new THREE.Object3D();
@@ -58,6 +63,11 @@ loader.load('/rakieta.glb', function (gltf) {
     rocketContainer.add(rocketModel)
 });
 
+// Baaardzo wstępny obiekt uderzenia
+const geometry = new THREE.CircleGeometry(1, 32);
+const material = new THREE.MeshBasicMaterial({color: 0xffff00});
+const hit = new THREE.Mesh(geometry, material);
+
 // Zmienne gry
 const projectiles = [];
 const speed = 0.125;
@@ -65,81 +75,26 @@ const opponentProjectiles = [];
 let health = 20;
 let fuel = 100;
 let shootCount = 40;
+let reloaded = true;
 
 // Sterowanie (controls.js)
 setupControls();
+setupInterface(controls)
 
-// UI
-const blocker = document.getElementById('blocker');
-const instructions = document.getElementById('instructions');
-//Pasek życia
-const healthBar = document.getElementById('health-bar');
-const healthBarContainer = document.getElementById('health-bar-container');
-//Paliwo
-const fuelBar = document.getElementById('fuel-bar');
-const fuelBarContainer = document.getElementById('fuel-bar-container');
-//Pociski
-const shootBar = document.getElementById('shoot-bar');
-const shootBarContainer = document.getElementById('shoot-bar-container');
-//Rakiety
-const rocketIcons = document.getElementById('rocket-icons');
-const rocket1 = document.getElementById('rocket1');
-const rocket2 = document.getElementById('rocket2');
+// Funkcja przeładowania
+function reload() {
+    const interval = setInterval(() => {
+        if (shootCount != 40 && controls.isLocked)
+            shootCount++;
 
-
-document.body.addEventListener('click', function () {
-    instructions.style.display = 'none';
-    blocker.style.display = 'none';
-    healthBar.style.display = 'block'
-    healthBarContainer.style.display = 'block'
-    fuelBar.style.display = 'block'
-    fuelBarContainer.style.display = 'block'
-    shootBar.style.display = 'block'
-    shootBarContainer.style.display = 'block'
-    rocketIcons.style.display = 'block'
-    rocket1.style.display = 'block'
-    rocket2.style.display = 'block'
-    controls.lock();
-}, false);
-
-controls.addEventListener('unlock', function () {
-    blocker.style.display = 'block';
-    instructions.style.display = '';
-    healthBar.style.display = 'none'
-    healthBarContainer.style.display = 'none'
-    fuelBar.style.display = 'none'
-    fuelBarContainer.style.display = 'none'
-    shootBar.style.display = 'none'
-    shootBarContainer.style.display = 'none'
-    rocketIcons.style.display = 'none'
-    rocket1.style.display = 'none'
-    rocket1.style.display = 'none'
-});
-
-
-controls.addEventListener('change', () => {
-    const euler = new THREE.Euler(0, controls.object.rotation.y, 0, 'YXZ');
-    controls.object.rotation.copy(euler);
-});
-
-
-// Baaardzo wstępny obiekt uderzenia
-const geometry = new THREE.CircleGeometry(1, 32);
-const material = new THREE.MeshBasicMaterial({color: 0xffff00});
-const hit = new THREE.Mesh(geometry, material);
-
-//Aktualziacja strzelania
-function updateShootBar() {
-    if (shootCount > 0) {
-        shootCount--; // Zmniejszenie ładunku
-        const shootPercentage = Math.max((shootCount / 40) * 100, 0);
-        shootBar.style.width = `${shootPercentage}%`; // Zmiana szerokości paska strzelania
-    }
+        if (shootCount == 40)
+            clearInterval(interval);
+    }, 100);
 }
 
 //Zmniejszanie paliwa
 setInterval(() => {
-    if (fuel > 0) {
+    if (fuel > 0 && controls.isLocked) {
         fuel--;
     }
 }, 1000);
@@ -150,21 +105,34 @@ function animate() {
         const { forward, right, left, fire, rocket } = getControlStates();
 
         controls.moveForward(speed);
-        if (forward) controls.moveForward(speed * 2);
+        if (forward){
+            controls.moveForward(speed * 2);
+            fuel -= 0.1 // Szybsze zużycie paliwa
+        }
         if (right) dodge(speed * 2, controls);
         if (left) dodge(-speed * 2, controls);
         if (fire) {
-            fireProjectile(scene, modelContainer, projectiles);
-            updateShootBar(); // Aktualizacja paska strzelania
+            if (shootCount > 0 && reloaded == true){
+                fireProjectile(scene, modelContainer, projectiles);
+                shootCount--;
+            }
+            else if (shootCount == 0){
+                reloaded = false
+                reload()
+            }
+            else if (shootCount == 40)
+                reloaded = true
         }
         if (rocket) fireRocket(scene, rocketContainer, modelContainer, opponentModelContainer, projectiles);
         
         playerBoundingBox.setFromObject(modelContainer);
         opponentBoundingBox.setFromObject(opponentModelContainer);
 
-        // Aktualizacja paska paliwa
-        const fuelPercentage = Math.max((fuel / 100) * 100, 0);
-        fuelBar.style.width = `${fuelPercentage}%`;
+        // Aktualizacja wszelkich pasków
+        updateBars(shootCount, fuel, health)
+
+        if(fuel < 0)
+            scene.remove(modelContainer); // Testowe usunięcie samolotu
 
         // Aktualizacja pocisków i kolizji
         for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -213,11 +181,7 @@ function animate() {
                 scene.add(hit);
 
                 health--;
-
-                // Aktualizacja paska życia
-                const healthPercentage = Math.max((health / 20) * 100, 0);
-                healthBar.style.width = `${healthPercentage}%`;
-
+                
                 scene.remove(oprojectile);
                 opponentProjectiles.splice(i, 1);
 
@@ -233,6 +197,12 @@ function animate() {
                 scene.remove(oprojectile);
                 opponentProjectiles.splice(i, 1);
             }
+        }
+        
+        // Kolizja
+        if (playerBoundingBox.containsPoint(opponentModelContainer.position)) {
+            scene.remove(modelContainer); // Testowe usunięcie samolotu
+            scene.remove(opponentModelContainer);
         }
 
         water.material.uniforms['time'].value += 1.0 / 60.0;
