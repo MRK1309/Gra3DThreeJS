@@ -4,10 +4,13 @@ let availableRockets = 2;
 
 // Funkcja aktualizująca widoczność ikon rakiet
 function updateRocketIcons() {
+    rocket2 = document.getElementById('rocket2')
+    rocket1 = document.getElementById('rocket1')
+
     if (availableRockets === 1) {
-        document.getElementById('rocket2').style.display = 'none';
+        rocket2.src = "public/rocket_locked.png"
     } else if (availableRockets === 0) {
-        document.getElementById('rocket1').style.display = 'none';
+        rocket1.src = "public/rocket_locked.png"
     }
 }
 export function fireRocket(scene, rocketContainer, modelContainer, opponentModelContainer, projectiles) {
@@ -40,7 +43,7 @@ export function fireRocket(scene, rocketContainer, modelContainer, opponentModel
             scene.add(rocket);
             projectiles.push(rocket);
         }
-     availableRockets--;
+        availableRockets--;
         updateRocketIcons();
     }
 }
