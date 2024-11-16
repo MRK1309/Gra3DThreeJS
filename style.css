@@ -4,6 +4,12 @@ body {
   font-family: Monospace;
 } 
 
+#bar{
+  margin: 0;
+  padding-left: 3px;
+  padding-top: 2px;
+}
+
 #blocker {
   position: absolute;
   width: 100%;
@@ -20,7 +26,7 @@ body {
   align-items: center;
 
   text-align: center;
-  font-size: 14px;
+  font-size: 17px;
   cursor: pointer; 
 }
 
