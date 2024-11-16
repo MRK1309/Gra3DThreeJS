@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 let forward = false;
 let right = false;
 let left = false;
@@ -26,7 +24,7 @@ function onDocumentKeyDown(event) {
             lastTurnTime = currentTime;
         }
     }
-    if (keyCode === 65 && currentTime - lastTurnTime > cooldownTime) { // D
+    if (keyCode === 65 && currentTime - lastTurnTime > cooldownTime) { // A
         if (!left){
             left = true;
             lastTurnTime = currentTime;
@@ -61,22 +59,9 @@ function onDocumentKeyUp(event) {
 }
 
 // Funkcja uniku
-export function dodge(speed, controls, scene, modelContainer) {
+export function dodge(speed, controls) {
     const duration = 500; // Czas trwania uniku
-    const cooldown = 5000; // Czas cooldownu
     const startTime = Date.now();
-
-    // Tworzenie licznika
-    let dodgeCounter = document.createElement('div');
-    dodgeCounter.style.position = 'absolute';
-    dodgeCounter.style.top = '90%'; // Ustawienie pozycji licznika
-    dodgeCounter.style.left = '50%';
-    dodgeCounter.style.transform = 'translate(-50%, -50%)';
-    dodgeCounter.style.fontSize = '32px';
-    dodgeCounter.style.color = '#00ff00';
-    dodgeCounter.style.fontFamily = 'Arial, sans-serif';
-    dodgeCounter.style.zIndex = '1000';
-    document.body.appendChild(dodgeCounter);
 
     // Logika uniku
     const interval = setInterval(() => {
@@ -89,25 +74,32 @@ export function dodge(speed, controls, scene, modelContainer) {
         }
     }, 1);
 
+    // Tworzenie licznika
+    let dodgeCounter = document.createElement('div');
+    dodgeCounter.style.position = 'absolute';
+    dodgeCounter.style.top = '90%'; // Ustawienie pozycji licznika
+    dodgeCounter.style.left = '50%';
+    dodgeCounter.style.transform = 'translate(-50%, -50%)';
+    dodgeCounter.style.fontSize = '32px';
+    dodgeCounter.style.color = '#fffff';
+    dodgeCounter.style.zIndex = '1000';
+    document.body.appendChild(dodgeCounter);
+
     // Cooldown (licznik odliczania)
     const cooldownStartTime = Date.now();
+
     const cooldownInterval = setInterval(() => {
         const elapsedCooldown = Date.now() - cooldownStartTime;
-        const remainingTime = Math.max(0, (cooldown - elapsedCooldown) / 1000).toFixed(1); // Licznik w sekundach
+        const remainingTime = Math.max(0, (cooldownTime - elapsedCooldown) / 1000).toFixed(1); // Licznik w sekundach
 
-        dodgeCounter.textContent = `Dodge Cooldown: ${remainingTime}s`;
+        dodgeCounter.textContent = `Unik niedostępny przez: ${remainingTime}s`;
 
-        if (elapsedCooldown >= cooldown) {
+        if (elapsedCooldown >= cooldownTime) {
             clearInterval(cooldownInterval);
-            setTimeout(() => {
-                document.body.removeChild(dodgeCounter); // Usunięcie licznika po cooldownie
-            }, 1000); // Po sekundzie od usunięcia tekstu
+            document.body.removeChild(dodgeCounter); // Usunięcie licznika po cooldownie
         }
     }, 100); // Aktualizacja co 100 ms (dla płynnego odliczania)
 }
-
-
-
 
 export function getControlStates() {
     const currentState = { forward, right, left, fire, rocket };
