@@ -109,8 +109,8 @@ function animate() {
             controls.moveForward(speed * 2);
             fuel -= 0.1 // Szybsze zużycie paliwa
         }
-        if (right) dodge(speed * 2, controls);
-        if (left) dodge(-speed * 2, controls);
+        if (right) dodge(speed * 2, controls, scene, modelContainer);
+        if (left) dodge(-speed * 2, controls, scene, modelContainer);
         if (fire) {
             if (shootCount > 0 && reloaded == true){
                 fireProjectile(scene, modelContainer, projectiles);
