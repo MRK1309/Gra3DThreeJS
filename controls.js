@@ -98,7 +98,23 @@ export function dodge(speed, controls) {
             clearInterval(cooldownInterval);
             document.body.removeChild(dodgeCounter); // Usunięcie licznika po cooldownie
         }
+
+        if (!controls.isLocked)
+            dodgeCounter.style.display = "none";
+        else
+            dodgeCounter.style.display = "";
+
     }, 100); // Aktualizacja co 100 ms (dla płynnego odliczania)
+}
+
+export function reload(shootCount, controls) {
+    const interval = setInterval(() => {
+        if (shootCount != 40 && controls.isLocked)
+            shootCount++;
+
+        if (shootCount == 40)
+            clearInterval(interval);
+    }, 100);
 }
 
 export function getControlStates() {
