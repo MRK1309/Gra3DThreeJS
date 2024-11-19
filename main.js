@@ -6,7 +6,7 @@ import { createSky, createWater } from './environment';
 import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
 import { fireRocket} from './rocket';
-import { opponentFollow, opponentGetHit, checkHit } from './opponent';
+import { opponentFollow, opponentGetHit, checkHit, setupOpponentHealthBar, updateOpponentHealthBar, updateHealthBarOrientation } from './opponent';
 import { gameOver } from './gameover';
 
 // Przygotowanie sceny
@@ -44,14 +44,18 @@ let playerBoundingBox = new THREE.Box3();
 const opponentModelContainer = new THREE.Object3D();
 let opponentModel = new THREE.Object3D();
 let opponentHitCount = 0;
+const maxOpponentHealth = 10;
 let opponentBoundingBox = new THREE.Box3();
 
 loader.load('/samolot_przeciwnik.glb', function (gltf) {
     opponentModel = gltf.scene;
-    opponentModel.rotation.y = Math.PI
+    opponentModel.rotation.y = Math.PI;
     opponentModelContainer.add(opponentModel);
     opponentModelContainer.position.z = modelContainer.position.z - 50;
     opponentBoundingBox.setFromObject(opponentModelContainer);
+
+    // Ustawienie paska życia przeciwnika
+    setupOpponentHealthBar(opponentModelContainer);
 });
 scene.add(opponentModelContainer);
 
@@ -137,6 +141,8 @@ function animate() {
 
         // Aktualizacja wszelkich pasków
         updateBars(shootCount, fuel, health);
+        updateOpponentHealthBar(maxOpponentHealth - opponentHitCount, maxOpponentHealth);
+        updateHealthBarOrientation(camera);
 
         // Zakończenie gry (brak paliwa lub zdrowia)
         if (fuel <= 0 || health <= 0) {
