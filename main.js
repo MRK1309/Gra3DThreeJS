@@ -7,6 +7,7 @@ import { fireProjectile, opponentFire } from './projectile';
 import { dodge, setupControls, getControlStates } from './controls';
 import { fireRocket} from './rocket';
 import { opponentFollow, opponentGetHit, checkHit } from './opponent';
+import { gameOver } from './gameover';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -28,6 +29,7 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
+
 // GLTFLoader - załadowanie modelu samolotu
 let myModel = new THREE.Object3D();
 const loader = new GLTFLoader();
@@ -44,7 +46,7 @@ let opponentModel = new THREE.Object3D();
 let opponentHitCount = 0;
 let opponentBoundingBox = new THREE.Box3();
 
-loader.load('/samolot.glb', function (gltf) {
+loader.load('/samolot_przeciwnik.glb', function (gltf) {
     opponentModel = gltf.scene;
     opponentModel.rotation.y = Math.PI
     opponentModelContainer.add(opponentModel);
@@ -107,40 +109,41 @@ setInterval(() => {
     }
 }, 1000);
 
-// Główna funkcja animacji
+
 function animate() {
     if (controls.isLocked) {
         const { forward, right, left, fire, rocket } = getControlStates();
 
         controls.moveForward(speed);
-        if (forward){
+        if (forward) {
             controls.moveForward(speed * 2);
-            fuel -= 0.1 // Szybsze zużycie paliwa
+            fuel -= 0.1; // Szybsze zużycie paliwa
         }
         if (right) dodge(speed * 2, controls);
         if (left) dodge(-speed * 2, controls);
         if (fire) {
-            if (shootCount > 0 && reloaded == true){
+            if (shootCount > 0 && reloaded == true) {
                 fireProjectile(scene, modelContainer, projectiles);
                 shootCount--;
-            }
-            else if (shootCount == 0){
-                reloaded = false
-                reload()
-            }
-            else if (shootCount == 40)
-                reloaded = true
+            } else if (shootCount == 0) {
+                reloaded = false;
+                reload();
+            } else if (shootCount == 40) reloaded = true;
         }
         if (rocket) fireRocket(scene, rocketContainer, modelContainer, opponentModelContainer, projectiles);
-        
+
         playerBoundingBox.setFromObject(modelContainer);
         opponentBoundingBox.setFromObject(opponentModelContainer);
 
         // Aktualizacja wszelkich pasków
-        updateBars(shootCount, fuel, health)
+        updateBars(shootCount, fuel, health);
 
-        if(fuel <= 0)
-            scene.remove(modelContainer); // Testowe usunięcie samolotu
+        // Zakończenie gry (brak paliwa lub zdrowia)
+        if (fuel <= 0 || health <= 0) {
+            controls.unlock();
+            gameOver(scene, modelContainer, opponentModelContainer, renderer);
+            return;
+        }
 
         // Aktualizacja pocisków i kolizji
         for (let i = projectiles.length - 1; i >= 0; i--) {
@@ -149,7 +152,7 @@ function animate() {
 
             if (scene.children.includes(opponentModelContainer)) {
                 if (opponentBoundingBox.containsPoint(projectile.position)) {
-                    opponentGetHit(opponentModelContainer, modelContainer, scene)
+                    opponentGetHit(opponentModelContainer, modelContainer, scene);
 
                     if (projectile.userData.type === 'rocket') {
                         opponentHitCount += 5;
@@ -188,10 +191,10 @@ function animate() {
             oprojectile.position.add(oprojectile.userData.velocity);
 
             if (playerBoundingBox.containsPoint(oprojectile.position)) {
-                getHit()
+                getHit();
 
                 health--;
-                
+
                 scene.remove(oprojectile);
                 opponentProjectiles.splice(i, 1);
 
@@ -212,17 +215,16 @@ function animate() {
         if (hit.position.distanceTo(modelContainer.position) > 1) {
             scene.remove(hit);
         }
-        checkHit(opponentModelContainer, scene)
-        
+        checkHit(opponentModelContainer, scene);
+
         // Kolizja
-        if (scene.children.includes(opponentModelContainer)){
+        if (scene.children.includes(opponentModelContainer)) {
             if (playerBoundingBox.containsPoint(opponentModelContainer.position)) {
-                opponentGetHit(opponentModelContainer, modelContainer, scene)
-                getHit()
-                
+                opponentGetHit(opponentModelContainer, modelContainer, scene);
+                getHit();
+
                 scene.remove(modelContainer); // Testowe usunięcie samolotu
                 scene.remove(opponentModelContainer);
-                
             }
         }
 
@@ -230,6 +232,8 @@ function animate() {
     }
     renderer.render(scene, camera);
 }
+
+
 
 // Woda
 const water = createWater();
@@ -246,9 +250,3 @@ const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
 directionalLight.position.set(10, 10, 10);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
-
-// const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-// scene.add(spotLightHelper);
-
-// const gridHelper = new THREE.GridHelper(100, 100);
-// scene.add(gridHelper);
