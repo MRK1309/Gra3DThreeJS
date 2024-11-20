@@ -17,7 +17,7 @@ export function setupOpponentHealthBar(opponentModelContainer) {
     healthBar = new THREE.Mesh(barGeometry, barMaterial);
 
     const containerGeometry = new THREE.PlaneGeometry(barWidth + 0.1, barHeight + 0.1);
-    const containerMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const containerMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
     healthBarContainer = new THREE.Mesh(containerGeometry, containerMaterial);
 
     healthBar.position.set(0, 3, 0); // Nad przeciwnikiem
@@ -36,8 +36,14 @@ export function updateOpponentHealthBar(health, maxHealth = 10) {
 }
 
 export function updateHealthBarOrientation(camera) {
+    const cameraPosition = new THREE.Vector3();
+    camera.getWorldPosition(cameraPosition);
+
     if (healthBarContainer) {
-        healthBarContainer.lookAt(camera.position); // Ustawienie orientacji przodem do kamery
+        healthBarContainer.lookAt(cameraPosition); // Ustawienie orientacji przodem do kamery
+    }
+    if (healthBar) {
+        healthBar.lookAt(cameraPosition); // Ustawienie orientacji przodem do kamery
     }
 }
 
