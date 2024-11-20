@@ -4,6 +4,7 @@ let left = false;
 let fire = false;
 let rocket = false;
 const cooldownTime = 5000;
+const cooldown = document.getElementById('cooldown');
 let lastTurnTime = 0;
 
 export function setupControls() {
@@ -22,12 +23,16 @@ function onDocumentKeyDown(event) {
         if (!right){
             right = true;
             lastTurnTime = currentTime;
+            cooldown.style.right = "40%";
+            cooldown.style.left = "";
         }
     }
     if (keyCode === 65 && currentTime - lastTurnTime > cooldownTime) { // A
         if (!left){
             left = true;
             lastTurnTime = currentTime;
+            cooldown.style.left = "40%";
+            cooldown.style.right = "";
         }
     }
     if (event.code === "Space") {
@@ -63,7 +68,6 @@ export function dodge(speed, controls) {
     const duration = 500; // Czas trwania uniku
     const startTime = Date.now();
 
-    // Logika uniku
     const interval = setInterval(() => {
         const elapsedTime = Date.now() - startTime;
 
@@ -74,47 +78,21 @@ export function dodge(speed, controls) {
         }
     }, 1);
 
-    // Tworzenie licznika
-    let dodgeCounter = document.createElement('div');
-    dodgeCounter.style.position = 'absolute';
-    dodgeCounter.style.top = '90%'; // Ustawienie pozycji licznika
-    dodgeCounter.style.left = '50%';
-    dodgeCounter.style.transform = 'translate(-50%, -50%)';
-    dodgeCounter.style.fontSize = '32px';
-    dodgeCounter.style.color = '#fffff';
-    dodgeCounter.style.zIndex = '1000';
-    document.body.appendChild(dodgeCounter);
-
     // Cooldown (licznik odliczania)
     const cooldownStartTime = Date.now();
 
     const cooldownInterval = setInterval(() => {
         const elapsedCooldown = Date.now() - cooldownStartTime;
-        const remainingTime = Math.max(0, (cooldownTime - elapsedCooldown) / 1000).toFixed(1); // Licznik w sekundach
-
-        dodgeCounter.textContent = `Unik niedostępny przez: ${remainingTime}s`;
+        
+        cooldown.style.display = "block";
 
         if (elapsedCooldown >= cooldownTime) {
             clearInterval(cooldownInterval);
-            document.body.removeChild(dodgeCounter); // Usunięcie licznika po cooldownie
+            cooldown.style.display = "none";
         }
-
         if (!controls.isLocked)
-            dodgeCounter.style.display = "none";
-        else
-            dodgeCounter.style.display = "";
-
-    }, 100); // Aktualizacja co 100 ms (dla płynnego odliczania)
-}
-
-export function reload(shootCount, controls) {
-    const interval = setInterval(() => {
-        if (shootCount != 40 && controls.isLocked)
-            shootCount++;
-
-        if (shootCount == 40)
-            clearInterval(interval);
-    }, 100);
+            cooldown.style.display = "none";
+    }); 
 }
 
 export function getControlStates() {
