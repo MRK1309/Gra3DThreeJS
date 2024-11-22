@@ -232,23 +232,55 @@ function animate() {
 }
 
 // Woda
+const mapContainer = new THREE.Object3D();
+scene.add(mapContainer);
+
 const water = createWater();
-scene.add(water);
+mapContainer.add(water);
 
 // Niebo i światło
 const sky = createSky();
 scene.add(sky);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 100);
+const ambientLight = new THREE.AmbientLight(0xffffff, 2); //było 100
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 2); //było 2
 directionalLight.position.set(10, 10, 10);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
 
-// const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-// scene.add(spotLightHelper);
+//const spotLightHelper = new THREE.SpotLightHelper(spotLight);
+//scene.add(spotLightHelper);
 
 // const gridHelper = new THREE.GridHelper(100, 100);
 // scene.add(gridHelper);
+
+
+// Mapa
+
+let wyspa = new THREE.Object3D();
+mapContainer.add(wyspa);
+
+loader.load('/wyspa.glb', function (gltf) {
+    wyspa.add(gltf.scene);
+});
+
+wyspa.position.y = -10;
+
+let wyspa2 = new THREE.Object3D();
+mapContainer.add(wyspa2);
+
+loader.load('/wyspa2.glb', function (gltf) {
+    wyspa2.add(gltf.scene);
+});
+
+//oś x - prawo lewo
+// oś y - góra dół
+//oś z - przód tył
+
+wyspa2.position.y = -10;
+wyspa2.position.x = 60;
+
+mapContainer.position.y -= 10;
+
