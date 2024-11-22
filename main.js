@@ -6,6 +6,7 @@ import { setupControls } from './controls';
 import { addPlayer } from './player';
 import { addOpponent } from './opponent';
 import { gameOver } from './gameover';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -67,7 +68,7 @@ function animate() {
 
         // Aktualizacja wszelkich pasków
         updateBars(player.shootCount, player.fuel, player.health);
-        
+
         // Aktualizacja pocisków i kolizji
         player.updateCollision(opponents, scene)
 
@@ -95,7 +96,7 @@ function animate() {
             // Sprawdzanie czy model został trafiony (przyszłe animacje)
             player.checkHit(scene);
             opponent.checkHit(scene);
-            
+
             if (scene.children.includes(opponent.model)) {
                 // Strzelanie przeciwnika
                 if (opponent.model.position.distanceTo(player.model.position) < 50 && opponent.model.position.distanceTo(player.model.position) > 20)
@@ -118,16 +119,38 @@ function animate() {
 }
 
 // Woda
+const mapContainer = new THREE.Object3D();
+scene.add(mapContainer);
+
 const water = createWater();
-scene.add(water);
+mapContainer.add(water);
 
 // Niebo
 const sky = createSky();
 scene.add(sky);
 
 // Światło
-const ambientLight = new THREE.AmbientLight(0xffffff, 100);
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
 scene.add(ambientLight);
 
 const directionalLight = createLight();
 scene.add(directionalLight);
+
+// Mapa
+
+let wyspa = new THREE.Object3D();
+mapContainer.add(wyspa);
+
+const loader = new GLTFLoader();
+loader.load('/mapa.glb', function (gltf) {
+    wyspa.add(gltf.scene);
+});
+
+wyspa.position.y = -20;
+
+//oś x - prawo lewo
+// oś y - góra dół
+//oś z - przód tył
+
+mapContainer.position.y -= 10;
+
