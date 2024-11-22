@@ -130,7 +130,8 @@ export function addPlayer(){
                     this.reload(controls);
                 } else if (this.shootCount == 40) this.reloaded = true;
             }
-            if (rocket) fireRocket(scene, this.model, this.findNearest(opponents), this.projectiles);
+            if (rocket) fireRocket(scene, this.model, opponents, this.projectiles);
+
         },
 
         // Aktualizacja pocisków i kolizji
