@@ -52,7 +52,7 @@ export function updateBars(shootCount, fuel, health) {
     shootBar.style.width = `${shootPercentage}%`;
 
     // Aktualizacja paska paliwa
-    const fuelPercentage = Math.max((fuel / 100) * 100, 0);
+    const fuelPercentage = Math.max((fuel / 1000) * 100, 0);
     fuelBar.style.width = `${fuelPercentage}%`;
 
     // Aktualizacja paska życia

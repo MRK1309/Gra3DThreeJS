@@ -1,45 +1,167 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
+//Obiekt uderzenia
 const geometry = new THREE.CircleGeometry(1, 32);
-const material2 = new THREE.MeshBasicMaterial({color: 0xed0909});
-const opponentHit = new THREE.Mesh(geometry, material2);
+const material2 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 
-export function opponentFollow(opponent, modelContainer){
-    const modelPosition = new THREE.Vector3();
-    modelContainer.getWorldPosition(modelPosition);  
-
-    const directionToModel = new THREE.Vector3().subVectors(modelPosition, opponent.position).normalize();
-    const distanceToModel = modelPosition.distanceTo(opponent.position);
-
-    let direction = new THREE.Vector3()
+export function addOpponent(){
+    const opponent = {
+        model: new THREE.Object3D(), 
+        boundingBox: new THREE.Box3(), 
+        health: 10,
+        projectiles: [],
+        healthBar: new THREE.Mesh(),
+        healthBarContainer: new THREE.Mesh(),
+        hit: new THREE.Mesh(geometry, material2),
     
-    const offset = 0.1;
-    if (distanceToModel > 20) {
-        direction = directionToModel
-        opponent.position.add(direction.multiplyScalar(offset));
-    } 
-    else {
-        direction = directionToModel.negate(); 
-        opponent.position.add(direction.multiplyScalar(offset));
-    }
+        // Podążanie za graczem
+        follow: function(modelContainer) {
+            const modelPosition = new THREE.Vector3();
+            modelContainer.getWorldPosition(modelPosition);
+        
+            const directionToModel = new THREE.Vector3().subVectors(modelPosition, this.model.position).normalize();
+            const distanceToModel = modelPosition.distanceTo(this.model.position);
+        
+            let direction = new THREE.Vector3();
+        
+            const offset = 0.1;
+            if (distanceToModel > 20) {
+                direction = directionToModel;
+                this.model.position.add(direction.multiplyScalar(offset));
+            } else {
+                direction = directionToModel.negate();
+                this.model.position.add(direction.multiplyScalar(offset));
+            }
+        
+            const turnSpeed = 0.1;
+            const currentRotation = this.model.rotation.y;
+            const targetRotation = Math.atan2(direction.x, direction.z);
+        
+            this.model.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
+        },
+    
+        // Ustawienie pasków życia
+        setupHealthBar:  function() {
+            const barWidth = 2;
+            const barHeight = 0.2;
+        
+            const barGeometry = new THREE.PlaneGeometry(barWidth, barHeight);
+            const barMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            this.healthBar = new THREE.Mesh(barGeometry, barMaterial);
+        
+            const containerGeometry = new THREE.PlaneGeometry(barWidth + 0.1, barHeight + 0.1);
+            const containerMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25 });
+            this.healthBarContainer = new THREE.Mesh(containerGeometry, containerMaterial);
+        
+            this.healthBar.position.set(0, 3, 0); // Nad przeciwnikiem
+            this.healthBarContainer.position.set(0, 3, 0);
+        
+            this.model.add(this.healthBarContainer);
+            this.model.add(this.healthBar);
+        },
+    
+        // Aktualizacja pasków życia
+        updateHealthBar: function(maxHealth = 10) {
+            if (this.healthBar) {
+                const healthRatio = Math.max(this.health / maxHealth, 0); // Zapewnia, że pasek nie ma ujemnej długości
+                this.healthBar.scale.x = healthRatio;
+                this.healthBar.position.x = (1 - healthRatio) * -0.5; // Dopasowanie pozycji paska życia
+            }
+        },
+    
+        // Aktualizacja orientacji pasków życia
+        updateHealthBarOrientation: function (camera) {
+            const cameraPosition = new THREE.Vector3();
+            camera.getWorldPosition(cameraPosition);
+        
+            if (this.healthBarContainer) {
+                this.healthBarContainer.lookAt(cameraPosition); // Ustawienie orientacji przodem do kamery
+            }
+            if (this.healthBar) {
+                this.healthBar.lookAt(cameraPosition); // Ustawienie orientacji przodem do kamery
+            }
+        },
+    
+        // Dodanie obiektu uderzenia
+        getHit: function (modelContainer, scene) {
+            this.hit.position.copy(this.model.position);
+            this.hit.rotation.copy(modelContainer.rotation);
+            scene.add(this.hit);
+        },
+    
+        // Usunięcie obiektu uderzenia
+        checkHit: function (scene) {
+            if (this.hit.position.distanceTo(this.model.position) > 1) {
+                scene.remove(this.hit);
+            }
+        },
+    
+        // Wczytanie modelu
+        loadModel: function(){
+            const opponentModelcontainer = new THREE.Object3D();
+            const opponentBoundingBox = new THREE.Box3();
+            const loader = new GLTFLoader();
+    
+            loader.load('/samolot_przeciwnik.glb', (gltf) => {
+                const opponentModel = gltf.scene;
+                opponentModel.rotation.y = Math.PI;
+                opponentModelcontainer.add(opponentModel);
+        
+                opponentModelcontainer.position.z = -50;
+                opponentBoundingBox.setFromObject(opponentModelcontainer);
+            });
+    
+            this.model = opponentModelcontainer;
+            this.boundingBox = opponentBoundingBox;
+            this.setupHealthBar();
+        },
 
-    const turnSpeed = 0.1;  
-    const currentRotation = opponent.rotation.y; 
-    const targetRotation = Math.atan2(direction.x, direction.z); 
+        // Wystrzelenie pocisku
+        fireProjectile: function (scene) {
+            if (this.projectiles.length >= 1) return;
 
-    opponent.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
+            const geometry = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+            const material = new THREE.MeshBasicMaterial({ color: 0xAE243B });
+            const projectile = new THREE.Mesh(geometry, material);
 
-    // console.log(distanceToModel)
-}
+            projectile.position.copy(this.model.position);
+            projectile.rotation.copy(this.model.rotation);
 
-export function opponentGetHit(opponentModelContainer, modelContainer, scene){
-    opponentHit.position.copy(opponentModelContainer.position);
-    opponentHit.rotation.copy(modelContainer.rotation);
-    scene.add(opponentHit);
-}
+            const velocity = new THREE.Vector3(0, 0, 1);
+            velocity.applyQuaternion(this.model.quaternion);
+            velocity.y = 0;
+            velocity.normalize().multiplyScalar(1);
 
-export function checkHit(opponentModelContainer, scene){
-    if (opponentHit.position.distanceTo(opponentModelContainer.position) > 1) {
-        scene.remove(opponentHit);
-    }
+            projectile.userData.velocity = velocity;
+            this.projectiles.push(projectile);
+            scene.add(projectile);
+        },
+
+        // Aktualizacja pocisków i kolizji
+        updateCollision: function (player, scene){
+            for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                const oprojectile = this.projectiles[i];
+                oprojectile.position.add(oprojectile.userData.velocity);
+    
+                if (player.boundingBox.containsPoint(oprojectile.position)) {
+                    player.getHit(scene);
+    
+                    player.health--;
+    
+                    scene.remove(oprojectile);
+                    this.projectiles.splice(i, 1);
+    
+                    continue;
+                }
+    
+                if (oprojectile.position.distanceTo(player.model.position) > 100) {
+                    scene.remove(oprojectile);
+                    this.projectiles.splice(i, 1);
+                }
+            }
+        }
+    };
+
+    return opponent;
 }
