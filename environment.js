@@ -37,8 +37,16 @@ export function createWater() {
         distortionScale: 3.7,
     });
 
-    water.position.y = -10;
+    water.position.y = -20;
     water.rotation.x = Math.PI * - 0.5;
 
     return water;
+}
+
+export function createLight() {
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight.position.set(10, 10, 10);
+    directionalLight.castShadow = true;
+
+    return directionalLight;
 }

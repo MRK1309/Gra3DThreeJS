@@ -1,6 +1,19 @@
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
 // Zmienna przechowująca liczbę dostępnych rakiet
 let availableRockets = 2;
+
+// Wczytanie modelu rakiety
+const loader = new GLTFLoader();
+const rocketContainer = new THREE.Object3D();
+
+loader.load('/rakieta.glb', function (gltf) {
+    const rocketModel = gltf.scene;
+    rocketModel.rotation.y = Math.PI
+
+    rocketContainer.add(rocketModel)
+});
 
 // Funkcja aktualizująca widoczność ikon rakiet
 function updateRocketIcons() {
@@ -8,12 +21,14 @@ function updateRocketIcons() {
     const rocket1 = document.getElementById('rocket1')
 
     if (availableRockets === 1) {
-        rocket2.src = "public/rocket_locked.png"
+        rocket2.src = "rocket_locked.png"
     } else if (availableRockets === 0) {
-        rocket1.src = "public/rocket_locked.png"
+        rocket1.src = "rocket_locked.png"
     }
 }
-export function fireRocket(scene, rocketContainer, modelContainer, opponentModelContainer, projectiles) {
+
+// Funkcja wystrzelenia rakiety
+export function fireRocket(scene, modelContainer, opponentModelContainer, projectiles) {
     const activeRockets = projectiles.filter(projectile => projectile.userData.type === 'rocket');
     if (availableRockets > 0) {    
         if (activeRockets.length >= 2) return;

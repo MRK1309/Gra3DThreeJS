@@ -15,6 +15,7 @@ export function addOpponent(){
         healthBarContainer: new THREE.Mesh(),
         hit: new THREE.Mesh(geometry, material2),
     
+        // Podążanie za graczem
         follow: function(modelContainer) {
             const modelPosition = new THREE.Vector3();
             modelContainer.getWorldPosition(modelPosition);
@@ -40,6 +41,7 @@ export function addOpponent(){
             this.model.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
         },
     
+        // Ustawienie pasków życia
         setupHealthBar:  function() {
             const barWidth = 2;
             const barHeight = 0.2;
@@ -59,6 +61,7 @@ export function addOpponent(){
             this.model.add(this.healthBar);
         },
     
+        // Aktualizacja pasków życia
         updateHealthBar: function(maxHealth = 10) {
             if (this.healthBar) {
                 const healthRatio = Math.max(this.health / maxHealth, 0); // Zapewnia, że pasek nie ma ujemnej długości
@@ -67,6 +70,7 @@ export function addOpponent(){
             }
         },
     
+        // Aktualizacja orientacji pasków życia
         updateHealthBarOrientation: function (camera) {
             const cameraPosition = new THREE.Vector3();
             camera.getWorldPosition(cameraPosition);
@@ -79,18 +83,21 @@ export function addOpponent(){
             }
         },
     
+        // Dodanie obiektu uderzenia
         getHit: function (modelContainer, scene) {
             this.hit.position.copy(this.model.position);
             this.hit.rotation.copy(modelContainer.rotation);
             scene.add(this.hit);
         },
     
+        // Usunięcie obiektu uderzenia
         checkHit: function (scene) {
             if (this.hit.position.distanceTo(this.model.position) > 1) {
                 scene.remove(this.hit);
             }
         },
     
+        // Wczytanie modelu
         loadModel: function(){
             const opponentModelcontainer = new THREE.Object3D();
             const opponentBoundingBox = new THREE.Box3();
@@ -108,6 +115,51 @@ export function addOpponent(){
             this.model = opponentModelcontainer;
             this.boundingBox = opponentBoundingBox;
             this.setupHealthBar();
+        },
+
+        // Wystrzelenie pocisku
+        fireProjectile: function (scene) {
+            if (this.projectiles.length >= 1) return;
+
+            const geometry = new THREE.CylinderGeometry(0.05, 0.05, 1, 8);
+            const material = new THREE.MeshBasicMaterial({ color: 0xAE243B });
+            const projectile = new THREE.Mesh(geometry, material);
+
+            projectile.position.copy(this.model.position);
+            projectile.rotation.copy(this.model.rotation);
+
+            const velocity = new THREE.Vector3(0, 0, 1);
+            velocity.applyQuaternion(this.model.quaternion);
+            velocity.y = 0;
+            velocity.normalize().multiplyScalar(1);
+
+            projectile.userData.velocity = velocity;
+            this.projectiles.push(projectile);
+            scene.add(projectile);
+        },
+
+        // Aktualizacja pocisków i kolizji
+        updateCollision: function (player, scene){
+            for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                const oprojectile = this.projectiles[i];
+                oprojectile.position.add(oprojectile.userData.velocity);
+    
+                if (player.boundingBox.containsPoint(oprojectile.position)) {
+                    player.getHit(scene);
+    
+                    player.health--;
+    
+                    scene.remove(oprojectile);
+                    this.projectiles.splice(i, 1);
+    
+                    continue;
+                }
+    
+                if (oprojectile.position.distanceTo(player.model.position) > 100) {
+                    scene.remove(oprojectile);
+                    this.projectiles.splice(i, 1);
+                }
+            }
         }
     };
 
