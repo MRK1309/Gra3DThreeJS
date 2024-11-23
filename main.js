@@ -34,20 +34,37 @@ controls.addEventListener('change', () => {
 });
 
 // Przeciwnicy
-const opp = addOpponent()
-const opp2 = addOpponent()
-const opponents = [opp, opp2]
+const opponents = [];
+const numberOfOpponents = 5;
+let createdOpponents = 0;
 
-let position = 0
-for (let i = 0; i < opponents.length; i++) {
-    const opponent = opponents[i];
+const interval = setInterval(() => {
+    if (createdOpponents >= numberOfOpponents) {
+        clearInterval(interval);
+        return;
+    }
 
-    opponent.loadModel()
-    opponent.model.position.x += position
+    const opponent = addOpponent();
+    opponent.loadModel();
+
+    let position;
+    do {
+        position = {
+            x: (Math.random() - 0.5) * 400,
+            z: (Math.random() - 0.5) * 400
+        };
+    } while (Math.sqrt(
+        Math.pow(position.x - player.model.position.x, 2) +
+        Math.pow(position.z - player.model.position.z, 2)
+    ) < 100);
+
+    opponent.model.position.x = position.x;
+    opponent.model.position.z = position.z;
+
     scene.add(opponent.model);
-
-    position += 50
-}
+    opponents.push(opponent);
+    createdOpponents++;
+}, 5000);
 
 // Sterowanie (controls.js)
 setupControls();
@@ -153,4 +170,3 @@ wyspa.position.y = -20;
 //oś z - przód tył
 
 mapContainer.position.y -= 10;
-
