@@ -108,7 +108,6 @@ export function addOpponent(){
                 opponentModel.rotation.y = Math.PI;
                 opponentModelcontainer.add(opponentModel);
         
-                opponentModelcontainer.position.z = -50;
                 opponentBoundingBox.setFromObject(opponentModelcontainer);
             });
     
@@ -164,4 +163,38 @@ export function addOpponent(){
     };
 
     return opponent;
+}
+
+export function createOpponents(numberOfOpponents, opponents, player, controls, scene){
+    let createdOpponents = 0;
+
+    const interval = setInterval(() => {
+        if (createdOpponents >= numberOfOpponents) {
+            clearInterval(interval);
+            return;
+        }
+
+        if (controls.isLocked) {
+            const opponent = addOpponent();
+            opponent.loadModel();
+
+            let position;
+            do {
+                position = {
+                    x: (Math.random() - 0.5) * 200,
+                    z: (Math.random() - 0.5) * 200
+                };
+            } while (Math.sqrt(
+                Math.pow(position.x - player.model.position.x, 2) +
+                Math.pow(position.z - player.model.position.z, 2)
+            ) < 100);
+
+            opponent.model.position.x = position.x;
+            opponent.model.position.z = position.z;
+
+            scene.add(opponent.model);
+            opponents.push(opponent);
+            createdOpponents++;
+        }
+    }, 5000);
 }
