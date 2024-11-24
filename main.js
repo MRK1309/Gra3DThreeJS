@@ -1,12 +1,11 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
 import { setupInterface, updateBars } from './interface';
-import { createLight, createSky, createWater } from './environment';
+import { createGround, createLight, createSky, createWater } from './environment';
 import { setupControls } from './controls';
 import { addPlayer } from './player';
-import { addOpponent } from './opponent';
+import { addOpponent, createOpponents } from './opponent';
 import { gameOver } from './gameover';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -36,37 +35,17 @@ controls.addEventListener('change', () => {
 // Przeciwnicy
 const opponents = [];
 const numberOfOpponents = 5;
-let createdOpponents = 0;
 
-const interval = setInterval(() => {
-    if (createdOpponents >= numberOfOpponents) {
-        clearInterval(interval);
-        return;
-    }
+const opponent1 = addOpponent()
+opponent1.loadModel()
+opponent1.model.position.z = (Math.random() - 0.5) * 300
+opponent1.model.position.x = (Math.random() - 0.5) * 300
+opponents.push(opponent1)
+scene.add(opponent1.model)
 
-    const opponent = addOpponent();
-    opponent.loadModel();
+createOpponents(numberOfOpponents, opponents, player, controls, scene)
 
-    let position;
-    do {
-        position = {
-            x: (Math.random() - 0.5) * 400,
-            z: (Math.random() - 0.5) * 400
-        };
-    } while (Math.sqrt(
-        Math.pow(position.x - player.model.position.x, 2) +
-        Math.pow(position.z - player.model.position.z, 2)
-    ) < 100);
-
-    opponent.model.position.x = position.x;
-    opponent.model.position.z = position.z;
-
-    scene.add(opponent.model);
-    opponents.push(opponent);
-    createdOpponents++;
-}, 5000);
-
-// Sterowanie (controls.js)
+// Sterowanie (controls.js);
 setupControls();
 
 // Elementy interfejsu
@@ -116,7 +95,7 @@ function animate() {
 
             if (scene.children.includes(opponent.model)) {
                 // Strzelanie przeciwnika
-                if (opponent.model.position.distanceTo(player.model.position) < 50 && opponent.model.position.distanceTo(player.model.position) > 20)
+                if (opponent.model.position.distanceTo(player.model.position) < 80 && opponent.model.position.distanceTo(player.model.position) > 20)
                     opponent.fireProjectile(scene);
 
                 // Kolizja przeciwnika z graczem
@@ -135,12 +114,18 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// Woda
+// Mapa
 const mapContainer = new THREE.Object3D();
+mapContainer.position.y = -40;
 scene.add(mapContainer);
 
+// Woda
 const water = createWater();
 mapContainer.add(water);
+
+// Ziemia
+const ground = createGround()
+mapContainer.add(ground);
 
 // Niebo
 const sky = createSky();
@@ -152,21 +137,3 @@ scene.add(ambientLight);
 
 const directionalLight = createLight();
 scene.add(directionalLight);
-
-// Mapa
-
-let wyspa = new THREE.Object3D();
-mapContainer.add(wyspa);
-
-const loader = new GLTFLoader();
-loader.load('/mapa.glb', function (gltf) {
-    wyspa.add(gltf.scene);
-});
-
-wyspa.position.y = -20;
-
-//oś x - prawo lewo
-// oś y - góra dół
-//oś z - przód tył
-
-mapContainer.position.y -= 10;

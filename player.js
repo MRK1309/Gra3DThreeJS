@@ -90,20 +90,6 @@ export function addPlayer(){
             }, 100);
         },
 
-        // Znalezienie najbliższego przeciwnika (dla rakiety)
-        findNearest: function (opponents){
-            let minDistance = opponents[0].model.position.distanceTo(this.model.position)
-            let nearest = opponents[0];
-            opponents.forEach(opponent => {
-                if(opponent.model.position.distanceTo(this.model.position) < minDistance){
-                    minDistance = opponent.model.position.distanceTo(this.model.position)
-                    nearest = opponent
-                }
-            });
-        
-            return nearest.model;
-        },
-
         // Obsługa sterowania
         useControls: function (controls, scene, opponents){
             const { forward, right, left, fire, rocket } = getControlStates();
@@ -164,7 +150,7 @@ export function addPlayer(){
                     }
                 }   
                 
-                if (projectile.position.distanceTo(this.model.position) > 100) {
+                if (projectile.position.distanceTo(this.model.position) > 150) {
                     scene.remove(projectile);
                     this.projectiles.splice(i, 1);
                 }
