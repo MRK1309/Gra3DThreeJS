@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Sky } from 'three/examples/jsm/objects/Sky';
 import { Water } from 'three/examples/jsm/objects/Water.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 export function createSky() {
     const sky = new Sky();
@@ -37,10 +38,24 @@ export function createWater() {
         distortionScale: 3.7,
     });
 
-    water.position.y = -20;
     water.rotation.x = Math.PI * - 0.5;
 
     return water;
+}
+
+export function createGround(){
+    const islands = new THREE.Object3D();
+
+    const loader = new GLTFLoader();
+    loader.load('/mapa.glb', function (gltf) {
+        islands.add(gltf.scene);
+    });
+
+    //oś x - prawo lewo
+    //oś y - góra dół
+    //oś z - przód tył
+
+    return islands;
 }
 
 export function createLight() {
