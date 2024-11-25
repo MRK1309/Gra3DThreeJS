@@ -6,6 +6,8 @@ import { setupControls } from './controls';
 import { addPlayer } from './player';
 import { addOpponent, createOpponents } from './opponent';
 import { gameOver } from './gameover';
+import { levelCompleted } from './levelCompleted';
+
 
 // Przygotowanie sceny
 const scene = new THREE.Scene();
@@ -35,6 +37,7 @@ controls.addEventListener('change', () => {
 // Przeciwnicy
 const opponents = [];
 const numberOfOpponents = 5;
+let destroyedOpponents = 0;
 
 const opponent1 = addOpponent()
 opponent1.loadModel()
@@ -75,6 +78,7 @@ function animate() {
             return;
         }
 
+        // Zaktualizuj przeciwników
         opponents.forEach(opponent => {
             // Aktualizacja hitboxów przeciwników
             opponent.boundingBox.setFromObject(opponent.model);
@@ -92,7 +96,7 @@ function animate() {
             // Sprawdzanie czy model został trafiony (przyszłe animacje)
             player.checkHit(scene);
             opponent.checkHit(scene);
-
+            
             if (scene.children.includes(opponent.model)) {
                 // Strzelanie przeciwnika
                 if (opponent.model.position.distanceTo(player.model.position) < 80 && opponent.model.position.distanceTo(player.model.position) > 20)
@@ -107,7 +111,18 @@ function animate() {
                     player.health = 0;
                 }
             }
+            if (opponent.health <= 0 && !opponent.isDestroyed) {
+                destroyedOpponents += 1;
+                opponent.isDestroyed = true;
+                console.log(destroyedOpponents);
+            }
         });
+        if (destroyedOpponents>=5) {
+            controls.unlock();
+            levelCompleted(scene, player.model, renderer);
+            return;
+        }
+        
         // Animacja wody
         water.material.uniforms['time'].value += 1.0 / 60.0;
     }
