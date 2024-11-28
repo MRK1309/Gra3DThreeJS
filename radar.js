@@ -17,8 +17,9 @@ export function setupRadar(radarSize = 100) {
 }
 
 export function updateRadar(player, opponents, radarContext, radarSize) {
-    const radarRange = 200;
-    const radarCenter = radarSize / 2;
+    const radarRange = 200; // Zasięg radaru
+    const radarCenter = radarSize / 2; // Środek radaru
+    const playerRotation = player.model.rotation.y; // Orientacja gracza
 
     // Wyczyść poprzednią ramkę radaru
     radarContext.clearRect(0, 0, radarSize, radarSize);
@@ -46,9 +47,10 @@ export function updateRadar(player, opponents, radarContext, radarSize) {
         // Pomijanie przeciwników poza zasięgiem
         if (distance > radarRange) return;
 
-        // Skalowanie pozycji do radaru
-        const radarX = radarCenter + (dx / radarRange) * radarCenter;
-        const radarY = radarCenter + (dz / radarRange) * radarCenter;
+        // Przeliczenie pozycji przeciwników względem orientacji gracza
+        const angle = Math.atan2(dz, dx) - playerRotation;
+        const radarX = radarCenter + Math.cos(angle) * (distance / radarRange) * radarCenter;
+        const radarY = radarCenter + Math.sin(angle) * (distance / radarRange) * radarCenter;
 
         radarContext.fillStyle = 'red'; // Kolor przeciwnika
         radarContext.beginPath();
