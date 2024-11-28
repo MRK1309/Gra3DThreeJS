@@ -14,6 +14,8 @@ const shootBarContainer = document.getElementById('shoot-bar-container');
 const rocketIcons = document.getElementById('rocket-icons');
 const rocket1 = document.getElementById('rocket1');
 const rocket2 = document.getElementById('rocket2');
+//Radar
+const radar = document.getElementById('radar');
 
 export function setupInterface(controls) {
     document.body.addEventListener('click', function () {
@@ -28,6 +30,7 @@ export function setupInterface(controls) {
         rocketIcons.style.display = 'block'
         rocket1.style.display = 'block'
         rocket2.style.display = 'block'
+        radar.style.display = 'block'
         controls.lock();
     }, false);
     
@@ -43,6 +46,7 @@ export function setupInterface(controls) {
         rocketIcons.style.display = 'none'
         rocket1.style.display = 'none'
         rocket2.style.display = 'none'
+        radar.style.display = 'none'
     });
 }
 

@@ -1,16 +1,7 @@
-// radar.js
-
 export function setupRadar(radarSize = 100) {
-    const radarCanvas = document.createElement('canvas');
+    const radarCanvas = document.getElementById('radar');
     radarCanvas.width = radarSize;
     radarCanvas.height = radarSize;
-    radarCanvas.style.position = 'absolute';
-    radarCanvas.style.top = '10px';
-    radarCanvas.style.right = '10px';
-    radarCanvas.style.border = '2px solid white';
-    radarCanvas.style.borderRadius = '50%';
-    radarCanvas.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    document.body.appendChild(radarCanvas);
 
     const radarContext = radarCanvas.getContext('2d');
     return { radarCanvas, radarContext, radarSize };
