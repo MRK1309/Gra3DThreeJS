@@ -37,7 +37,7 @@ controls.addEventListener('change', () => {
 
 // Przeciwnicy
 const opponents = [];
-const numberOfOpponents = 5;
+const numberOfOpponents = 4;
 let destroyedOpponents = 0;
 
 const opponent1 = addOpponent()
@@ -72,7 +72,7 @@ function animate() {
         // Aktualizacja wszelkich pasków
         updateBars(player.shootCount, player.fuel, player.health);
 
-         // Aktualizacja radaru
+        // Aktualizacja radaru
         updateRadar(player, opponents, radarContext, radarSize);
 
         // Aktualizacja pocisków i kolizji
@@ -100,6 +100,9 @@ function animate() {
             // Aktualizacja pocisków i kolizji przeciwnika
             opponent.updateCollision(player, scene)
 
+            // Omijanie innych przeciwników
+            opponent.avoidOtherOpponents(opponents);
+
             // Sprawdzanie czy model został trafiony (przyszłe animacje)
             player.checkHit(scene);
             opponent.checkHit(scene);
@@ -124,7 +127,7 @@ function animate() {
                 console.log(destroyedOpponents);
             }
         });
-        if (destroyedOpponents+1>=5) {
+        if (destroyedOpponents>=numberOfOpponents+1) {
             controls.unlock();
             levelCompleted(scene, player.model, renderer);
             return;

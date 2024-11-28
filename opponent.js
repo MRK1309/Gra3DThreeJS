@@ -14,6 +14,7 @@ export function addOpponent(){
         healthBar: new THREE.Mesh(),
         healthBarContainer: new THREE.Mesh(),
         hit: new THREE.Mesh(geometry, material2),
+        isTurningAround: false,
     
         // Podążanie za graczem
         follow: function(modelContainer) {
@@ -24,14 +25,25 @@ export function addOpponent(){
             const distanceToModel = modelPosition.distanceTo(this.model.position);
         
             let direction = new THREE.Vector3();
-        
             const offset = 0.1;
-            if (distanceToModel > 20) {
-                direction = directionToModel;
-                this.model.position.add(direction.multiplyScalar(offset));
+        
+            const turnAroundDistance = 25; 
+            const chaseDistance = 35;      
+        
+            if (this.isTurningAround) {
+                if (distanceToModel > chaseDistance) {
+                    this.isTurningAround = false;
+                } else {
+                    direction = directionToModel.negate();
+                    this.model.position.add(direction.multiplyScalar(offset));
+                }
             } else {
-                direction = directionToModel.negate();
-                this.model.position.add(direction.multiplyScalar(offset));
+                if (distanceToModel < turnAroundDistance) {
+                    this.isTurningAround = true;
+                } else {
+                    direction = directionToModel;
+                    this.model.position.add(direction.multiplyScalar(offset));
+                }
             }
         
             const turnSpeed = 0.1;
@@ -40,11 +52,29 @@ export function addOpponent(){
         
             this.model.rotation.y = THREE.MathUtils.lerp(currentRotation, targetRotation, turnSpeed);
         },
+        
+        // Omijanie innych przeciwników (bardzo wstępne)
+        avoidOtherOpponents: function(opponents) {
+            let direction = new THREE.Vector3();
+            const offset = 0.1;
+        
+            opponents.forEach(opponent => {
+                if (opponent !== this) {
+                    const distanceToOpponent = this.model.position.distanceTo(opponent.model.position);
     
+                    if (distanceToOpponent < 25) { 
+                        const directionToOpponent = new THREE.Vector3().subVectors(opponent.model.position, this.model.position).normalize();
+                        direction = directionToOpponent.negate();
+                        this.model.position.add(direction.multiplyScalar(offset));
+                    }
+                }
+            });
+        },
+
         // Ustawienie pasków życia
         setupHealthBar:  function() {
             const barWidth = 2;
-            const barHeight = 0.2;
+            const barHeight = 0.3;
         
             const barGeometry = new THREE.PlaneGeometry(barWidth, barHeight);
             const barMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
