@@ -7,6 +7,7 @@ import { addPlayer } from './player';
 import { addOpponent, createOpponents } from './opponent';
 import { gameOver } from './gameover';
 import { levelCompleted } from './levelCompleted';
+import { setupRadar, updateRadar } from './radar';
 
 
 // Przygotowanie sceny
@@ -54,6 +55,9 @@ setupControls();
 // Elementy interfejsu
 setupInterface(controls)
 
+// Tworzenie radaru
+const { radarContext, radarSize } = setupRadar();
+
 //Zmniejszanie paliwa
 player.fuelConsume(controls);
 
@@ -67,6 +71,9 @@ function animate() {
 
         // Aktualizacja wszelkich pasków
         updateBars(player.shootCount, player.fuel, player.health);
+
+         // Aktualizacja radaru
+        updateRadar(player, opponents, radarContext, radarSize);
 
         // Aktualizacja pocisków i kolizji
         player.updateCollision(opponents, scene)
@@ -117,7 +124,7 @@ function animate() {
                 console.log(destroyedOpponents);
             }
         });
-        if (destroyedOpponents>=5) {
+        if (destroyedOpponents+1>=5) {
             controls.unlock();
             levelCompleted(scene, player.model, renderer);
             return;
