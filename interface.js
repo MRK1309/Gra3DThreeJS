@@ -1,3 +1,6 @@
+import { addPlayer } from './player';
+const player = addPlayer()
+
 // Plansza początkowa
 const blocker = document.getElementById('blocker');
 const instructions = document.getElementById('instructions');
@@ -52,14 +55,14 @@ export function setupInterface(controls) {
 
 export function updateBars(shootCount, fuel, health) {
     // Aktualizacja strzelania
-    const shootPercentage = Math.max((shootCount / 40) * 100, 0);
+    const shootPercentage = Math.max((shootCount / player.ammunition) * 100, 0);
     shootBar.style.width = `${shootPercentage}%`;
 
     // Aktualizacja paska paliwa
-    const fuelPercentage = Math.max((fuel / 1000) * 100, 0);
+    const fuelPercentage = Math.max((fuel / player.fuel) * 100, 0);
     fuelBar.style.width = `${fuelPercentage}%`;
 
     // Aktualizacja paska życia
-    const healthPercentage = Math.max((health / 20) * 100, 0);
+    const healthPercentage = Math.max((health / player.health) * 100, 0);
     healthBar.style.width = `${healthPercentage}%`;
 }

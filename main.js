@@ -5,8 +5,7 @@ import { createGround, createLight, createSky, createWater } from './environment
 import { setupControls } from './controls';
 import { addPlayer } from './player';
 import { addOpponent, createOpponents } from './opponent';
-import { gameOver } from './gameover';
-import { levelCompleted } from './levelCompleted';
+import { gameOver, levelCompleted } from './levelCompleted';
 import { setupRadar, updateRadar } from './radar';
 
 
@@ -121,12 +120,14 @@ function animate() {
                     player.health = 0;
                 }
             }
+            // Zliczanie zniszczonych przeciwników
             if (opponent.health <= 0 && !opponent.isDestroyed) {
                 destroyedOpponents += 1;
                 opponent.isDestroyed = true;
                 console.log(destroyedOpponents);
             }
         });
+        // Przejście poziomu
         if (destroyedOpponents>=numberOfOpponents+1) {
             controls.unlock();
             levelCompleted(scene, player.model, renderer);

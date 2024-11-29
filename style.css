@@ -141,3 +141,29 @@ body {
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+#gameover{
+  display: none;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  color: white;
+  background: black;
+  text-align: center;
+}
+
+#level-completed{
+  display: none;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  color: white;
+  background: green;
+  text-align: center;
+}

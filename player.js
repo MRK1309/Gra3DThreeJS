@@ -15,6 +15,7 @@ export function addPlayer(){
         health: 20,
         fuel: 1000,
         fuelUsage: 0.1,
+        ammunition: 40,
         shootCount: 40,
         projectiles: [],
         reloaded: true,
@@ -82,10 +83,10 @@ export function addPlayer(){
         // Przeładowanie broni
         reload: function (controls) {
             const interval = setInterval(() => {
-                if (this.shootCount != 40 && controls.isLocked)
+                if (this.shootCount != this.ammunition && controls.isLocked)
                     this.shootCount++;
         
-                if (this.shootCount == 40)
+                if (this.shootCount == this.ammunition)
                     clearInterval(interval);
             }, 100);
         },
@@ -114,7 +115,7 @@ export function addPlayer(){
                 } else if (this.shootCount == 0) {
                     this.reloaded = false;
                     this.reload(controls);
-                } else if (this.shootCount == 40) this.reloaded = true;
+                } else if (this.shootCount == this.ammunition) this.reloaded = true;
             }
             if (rocket) fireRocket(scene, this.model, opponents, this.projectiles);
 
