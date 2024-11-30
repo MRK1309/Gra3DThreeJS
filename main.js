@@ -5,7 +5,7 @@ import { createGround, createLight, createSky, createWater } from './environment
 import { setupControls } from './controls';
 import { addPlayer } from './player';
 import { addOpponent, createOpponents } from './opponent';
-import { gameOver, levelCompleted } from './levelCompleted';
+import { currentLevel, gameOver, levelCompleted } from './levelCompleted';
 import { setupRadar, updateRadar } from './radar';
 
 
@@ -34,17 +34,21 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
+let current = 0;
+let levels = currentLevel()
+let level = levels[current]
+
+
 // Przeciwnicy
 const opponents = [];
-const numberOfOpponents = 4;
-let destroyedOpponents = 0;
+let numberOfOpponents = level.numberOfOpponents;
 
-const opponent1 = addOpponent()
-opponent1.loadModel()
-opponent1.model.position.z = (Math.random() - 0.5) * 300
-opponent1.model.position.x = (Math.random() - 0.5) * 300
-opponents.push(opponent1)
-scene.add(opponent1.model)
+// const opponent1 = addOpponent()
+// opponent1.loadModel()
+// opponent1.model.position.z = (Math.random() - 0.5) * 300
+// opponent1.model.position.x = (Math.random() - 0.5) * 300
+// opponents.push(opponent1)
+// scene.add(opponent1.model)
 
 createOpponents(numberOfOpponents, opponents, player, controls, scene)
 
@@ -122,15 +126,25 @@ function animate() {
             }
             // Zliczanie zniszczonych przeciwników
             if (opponent.health <= 0 && !opponent.isDestroyed) {
-                destroyedOpponents += 1;
+                level.destroyedOpponents += 1;
                 opponent.isDestroyed = true;
-                console.log(destroyedOpponents);
+                console.log(level.destroyedOpponents);
             }
         });
         // Przejście poziomu
-        if (destroyedOpponents>=numberOfOpponents+1) {
+        if (level.destroyedOpponents>=numberOfOpponents) {
+            player.model.position.set(0, 0, 0)
+            current++;
+            if(current == levels.length){
+
+            }else{
+                level = levels[current]
+                numberOfOpponents = level.numberOfOpponents
+                createOpponents(numberOfOpponents, opponents, player, controls, scene)
+            }
+
             controls.unlock();
-            levelCompleted(scene, player.model, renderer);
+            levelCompleted(scene, player, renderer)
             return;
         }
         
@@ -142,7 +156,7 @@ function animate() {
 
 // Mapa
 const mapContainer = new THREE.Object3D();
-mapContainer.position.y = -40;
+mapContainer.position.y = -50;
 scene.add(mapContainer);
 
 // Woda

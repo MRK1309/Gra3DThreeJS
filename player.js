@@ -14,7 +14,7 @@ export function addPlayer(){
         speed: 0.125,
         health: 20,
         fuel: 1000,
-        fuelUsage: 0.1,
+        fuelUsage: 0.2,
         ammunition: 40,
         shootCount: 40,
         projectiles: [],
