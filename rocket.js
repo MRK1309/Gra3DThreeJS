@@ -1,8 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-let availableRockets = 2;
-
 const loader = new GLTFLoader();
 const rocketContainer = new THREE.Object3D();
 
@@ -13,25 +11,14 @@ loader.load('/rakieta.glb', function (gltf) {
     rocketContainer.add(rocketModel);
 });
 
-function updateRocketIcons() {
-    const rocket2 = document.getElementById('rocket2');
-    const rocket1 = document.getElementById('rocket1');
-
-    if (availableRockets === 1) {
-        rocket2.src = "rocket_locked.png";
-    } else if (availableRockets === 0) {
-        rocket1.src = "rocket_locked.png";
-    }
-}
-
-export function fireRocket(scene, playerModel, opponents, projectiles) {
+export function fireRocket(scene, player, opponents, projectiles) {
     const activeRockets = projectiles.filter(projectile => projectile.userData.type === 'rocket');
-    if (availableRockets > 0) {
+    if (player.availableRockets > 0) {
         if (activeRockets.length >= 2) return;
 
         if (rocketContainer) {
             const rocket = rocketContainer.clone();
-            rocket.position.copy(playerModel.position);
+            rocket.position.copy(player.model.position);
             rocket.scale.set(0.25, 0.25, 0.25);
 
             let closestOpponent = null;
@@ -61,18 +48,17 @@ export function fireRocket(scene, playerModel, opponents, projectiles) {
                 // Jeśli brak przeciwników, rakieta leci do przodu
                 rocket.userData = {
                     velocity: new THREE.Vector3(0, 0, -1)
-                        .applyQuaternion(playerModel.quaternion)
+                        .applyQuaternion(player.model.quaternion)
                         .multiplyScalar(0.5),
                     type: 'rocket'
                 };
-                rocket.rotation.copy(playerModel.rotation);
+                rocket.rotation.copy(player.model.rotation);
             }
 
             scene.add(rocket);
             projectiles.push(rocket);
         }
 
-        availableRockets--;
-        updateRocketIcons();
+        player.availableRockets--;
     }
 }

@@ -66,3 +66,17 @@ export function updateBars(shootCount, fuel, health) {
     const healthPercentage = Math.max((health / player.health) * 100, 0);
     healthBar.style.width = `${healthPercentage}%`;
 }
+
+export function updateRocketIcons(availableRockets) {
+    const rocket2 = document.getElementById('rocket2');
+    const rocket1 = document.getElementById('rocket1');
+
+    if (availableRockets === 1) {
+        rocket1.src = "rocket_locked.png";
+    } else if (availableRockets === 0) {
+        rocket2.src = "rocket_locked.png";
+    } else if (availableRockets === 2) {
+        rocket2.src = "rocket.png";
+        rocket1.src = "rocket.png";
+    }
+}

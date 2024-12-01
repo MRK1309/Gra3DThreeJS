@@ -19,6 +19,7 @@ export function addPlayer(){
         shootCount: 40,
         projectiles: [],
         reloaded: true,
+        availableRockets: 2,
         hit: new THREE.Mesh(geometry, material2),
         
         // Zmniejszanie paliwa
@@ -117,7 +118,7 @@ export function addPlayer(){
                     this.reload(controls);
                 } else if (this.shootCount == this.ammunition) this.reloaded = true;
             }
-            if (rocket) fireRocket(scene, this.model, opponents, this.projectiles);
+            if (rocket) fireRocket(scene, this, opponents, this.projectiles);
 
         },
 

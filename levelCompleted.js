@@ -18,14 +18,15 @@ export function levelCompleted(scene, player, renderer) {
     cancelAnimationFrame(renderer.domElement);
 
     const nextLevelButton = document.getElementById('nextLevelButton');
-        nextLevelButton.addEventListener('click', () => {
-            player.health = 20
-            player.fuel = 1000
-            player.shootCount = 40
+    nextLevelButton.addEventListener('click', () => {
+        player.health = 20
+        player.fuel = 1000
+        player.shootCount = 40
+        player.availableRockets = 2
 
-            levelCompletedScreen.style.display = 'none';
-            scene.add(player.model);
-});
+        levelCompletedScreen.style.display = 'none';
+        scene.add(player.model);
+    });
 }
 
 // Funkcja wyświetlająca ekran "Game Over"
@@ -37,23 +38,31 @@ export function gameOver(scene, modelContainer, renderer) {
 }
 
 const levels = [
-    {
-        numberOfOpponents: 4,
-        destroyedOpponents: 0
+    {   // 1
+        numberOfOpponents: 5,
+        destroyedOpponents: 0,
+        damage: 1
     },
-    {
-        numberOfOpponents: 6,
-        destroyedOpponents: 0
+    {   // 2
+        numberOfOpponents: 7,
+        destroyedOpponents: 0,
+        damage: 1
     },
-    // {
-    //     numberOfOpponents: 8,
-    //     destroyedOpponents: 0
-    // },
-    // {
-    //     numberOfOpponents: 10,
-    //     destroyedOpponents: 0
-    // },
-    // Dodaj kolejne poziomy
+    {   // 3
+        numberOfOpponents: 7,
+        destroyedOpponents: 0,
+        damage: 2
+    },
+    {   // 4
+        numberOfOpponents: 7,
+        destroyedOpponents: 0,
+        damage: 2
+    },
+    {   // 5
+        numberOfOpponents: 7,
+        destroyedOpponents: 0,
+        damage: 2
+    },
 ];
 
 export function currentLevel(){

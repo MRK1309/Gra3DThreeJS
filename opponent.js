@@ -11,6 +11,7 @@ export function addOpponent(){
         boundingBox: new THREE.Box3(), 
         health: 10,
         projectiles: [],
+        damage: 1,
         healthBar: new THREE.Mesh(),
         healthBarContainer: new THREE.Mesh(),
         hit: new THREE.Mesh(geometry, material2),
@@ -176,7 +177,7 @@ export function addOpponent(){
                 if (player.boundingBox.containsPoint(oprojectile.position)) {
                     player.getHit(scene);
     
-                    player.health--;
+                    player.health -= this.damage;
     
                     scene.remove(oprojectile);
                     this.projectiles.splice(i, 1);
@@ -195,7 +196,7 @@ export function addOpponent(){
     return opponent;
 }
 
-export function createOpponents(numberOfOpponents, opponents, player, controls, scene, time=5000){
+export function createOpponents(numberOfOpponents, opponents, player, controls, scene, time, damage=1){
     let createdOpponents = 0;
 
     const interval = setInterval(() => {
@@ -221,6 +222,8 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
 
             opponent.model.position.x = position.x;
             opponent.model.position.z = position.z;
+
+            opponent.damage = damage
 
             scene.add(opponent.model);
             opponents.push(opponent);
