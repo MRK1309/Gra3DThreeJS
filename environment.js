@@ -47,7 +47,7 @@ export function createGround(){
     const islands = new THREE.Object3D();
 
     const loader = new GLTFLoader();
-    loader.load('/mapa.glb', function (gltf) {
+    loader.load('/mapa2.glb', function (gltf) {
         islands.add(gltf.scene);
     });
 

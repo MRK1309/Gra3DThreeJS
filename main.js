@@ -187,6 +187,7 @@ mapContainer.add(water);
 // Ziemia
 const ground = createGround()
 mapContainer.add(ground);
+ground.position.y += 0.185;
 
 // Niebo
 const sky = createSky();
