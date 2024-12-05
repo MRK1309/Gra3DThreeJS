@@ -196,7 +196,7 @@ export function addOpponent(){
     return opponent;
 }
 
-export function createOpponents(numberOfOpponents, opponents, player, controls, scene, time, damage=1){
+export function createOpponents(numberOfOpponents, opponents, player, controls, scene, time, damage){
     let createdOpponents = 0;
 
     const interval = setInterval(() => {

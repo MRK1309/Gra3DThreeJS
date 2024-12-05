@@ -13,7 +13,7 @@ export function addPlayer(){
         boundingBox: new THREE.Box3(), 
         speed: 0.125,
         health: 20,
-        fuel: 1000,
+        fuel: 800,
         fuelUsage: 0.2,
         ammunition: 40,
         shootCount: 40,

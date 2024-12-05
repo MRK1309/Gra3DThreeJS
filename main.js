@@ -4,8 +4,8 @@ import { setupInterface, updateBars, updateRocketIcons } from './interface';
 import { createGround, createLight, createSky, createWater } from './environment';
 import { setupControls } from './controls';
 import { addPlayer } from './player';
-import { addOpponent, createOpponents } from './opponent';
-import { currentLevel, gameOver, levelCompleted } from './levelCompleted';
+import { createOpponents } from './opponent';
+import { getLevels, gameOver, levelCompleted } from './levels';
 import { setupRadar, updateRadar } from './radar';
 
 
@@ -34,23 +34,13 @@ controls.addEventListener('change', () => {
     controls.object.rotation.copy(euler);
 });
 
-let current = 0;
-let levels = currentLevel()
-let level = levels[current]
-
+// Poziom gry
+const levels = getLevels()
+let currentLevel = 0;
+let level = levels[currentLevel]
 
 // Przeciwnicy
 const opponents = [];
-let numberOfOpponents = level.numberOfOpponents;
-
-// const opponent1 = addOpponent()
-// opponent1.loadModel()
-// opponent1.model.position.z = (Math.random() - 0.5) * 300
-// opponent1.model.position.x = (Math.random() - 0.5) * 300
-// opponents.push(opponent1)
-// scene.add(opponent1.model)
-
-createOpponents(numberOfOpponents, opponents, player, controls, scene, 5000)
 
 // Sterowanie (controls.js);
 setupControls();
@@ -66,6 +56,13 @@ player.fuelConsume(controls);
 
 function animate() {
     if (controls.isLocked) {
+        // Rozpoczęcie poziomu
+        if(level.started == false){
+            level.started = true
+            createOpponents(1, opponents, player, controls, scene, 0, level.damage)
+            createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
+        }
+
         // Obsługa sterowania
         player.useControls(controls, scene, opponents)
 
@@ -135,36 +132,24 @@ function animate() {
             }
         });
         // Przejście poziomu
-        if (level.destroyedOpponents>=numberOfOpponents) {
-            player.model.position.set(0, 0, 0)
-            player.model.rotation.set(0, 0, 0)
-            current++;
-            if(current >= levels.length){
+        if (level.destroyedOpponents>=level.numberOfOpponents+1) {
+            currentLevel++;
+
+            if(currentLevel >= levels.length){
                 controls.unlock();
                 gameOver(scene, player.model, renderer); // tymczasowo
                 return;
             }else{
-                level = levels[current]
-                numberOfOpponents = level.numberOfOpponents
-                createOpponents(numberOfOpponents, opponents, player, controls, scene, 4500, level.damage)
+                // Zmiana poziomu na kolejny
+                level = levels[currentLevel]
 
-                scene.remove(player.hit)
-                player.projectiles.forEach(projectile => {
-                    scene.remove(projectile)
-                });
-
-                opponents.forEach(opponent => {
-                    opponent.projectiles.forEach(projectile => {
-                        scene.remove(projectile)
-                    });
-                    scene.remove(opponent.hit)
-                });
-
-                controls.unlock();
-                levelCompleted(scene, player, renderer, controls)
+                // Wyświetlenie ekranu ukończenia poziomu i reset właściwości
+                levelCompleted(scene, player, renderer, opponents)
                 return;
             }
         }
+
+        // Pauza gry, gdy poziom został ukończony
         const levelCompletedScreen = document.getElementById('level-completed');
         if(levelCompletedScreen.style.display == 'block')
             controls.unlock();
