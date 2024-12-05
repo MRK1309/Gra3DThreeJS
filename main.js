@@ -7,6 +7,8 @@ import { addPlayer } from './player';
 import { createOpponents } from './opponent';
 import { getLevels, gameOver, levelCompleted } from './levels';
 import { setupRadar, updateRadar } from './radar';
+import { addTower } from './tower';
+
 
 
 // Przygotowanie sceny
@@ -54,6 +56,10 @@ const { radarContext, radarSize } = setupRadar();
 //Zmniejszanie paliwa
 player.fuelConsume(controls);
 
+// Model wieży 
+const tower = addTower();
+tower.loadModel()
+
 function animate() {
     if (controls.isLocked) {
         // Rozpoczęcie poziomu
@@ -61,6 +67,13 @@ function animate() {
             level.started = true
             createOpponents(1, opponents, player, controls, scene, 0, level.damage)
             createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
+        }
+
+        if (currentLevel >= 3){
+            scene.add(tower.model)
+
+            tower.fireProjectile(scene, player)
+            tower.updateCollision(player, scene)
         }
 
         // Obsługa sterowania
@@ -162,7 +175,7 @@ function animate() {
 
 // Mapa
 const mapContainer = new THREE.Object3D();
-mapContainer.position.y = -50;
+mapContainer.position.y = -55;
 scene.add(mapContainer);
 
 // Woda
