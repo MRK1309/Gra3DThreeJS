@@ -77,15 +77,55 @@ export function levelCompleted(scene, player, renderer, opponents) {
     levelCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
+    const shopButton = document.getElementById('shop');
+    const shopScreen = document.getElementById('shop-screen');
+    const exitShopButton = document.getElementById('exitShop');
     const nextLevelButton = document.getElementById('nextLevelButton');
+    const buyHealthButton = document.getElementById('buyHealth');
+    const buySpeedButton = document.getElementById('buySpeed');
+    const buyAmmoButton = document.getElementById('buyAmmo');
+
+    // Obsługa przycisku "Next Level"
     nextLevelButton.addEventListener('click', () => {
         // Reset mapy i gracza
-        cleanLevel(player, opponents, scene)
+        cleanLevel(player, opponents, scene);
 
         levelCompletedScreen.style.display = 'none';
         scene.add(player.model);
     });
+
+    // Funkcja pokazująca sklep
+    shopButton.addEventListener('click', () => {
+        shopScreen.style.display = 'block';
+        levelCompletedScreen.style.display = 'none';
+    });
+
+    // Funkcja ukrywająca sklep
+    exitShopButton.addEventListener('click', () => {
+        shopScreen.style.display = 'none';
+        levelCompletedScreen.style.display = 'block';
+    });
+
+    // Obsługa zakupu zdrowia
+    buyHealthButton.addEventListener('click', () => {
+        player.health += 5; // Dodaj 5 do zdrowia gracza
+        console.log(`Player health increased to: ${player.health}`);
+    });
+
+    // Obsługa zakupu szybkości
+    buySpeedButton.addEventListener('click', () => {
+        player.speed += 0.05; // Dodaj 0.05 do szybkości gracza
+        console.log(`Player speed increased to: ${player.speed}`);
+    });
+
+    // Obsługa zakupu amunicji
+    buyAmmoButton.addEventListener('click', () => {
+        player.ammunition += 10; // Dodaj 10 do amunicji gracza
+        player.shootCount = player.ammunition; // Ustaw bieżącą liczbę pocisków na nową wartość
+        console.log(`Player ammunition increased to: ${player.ammunition}`);
+    });
 }
+
 
 // Funkcja restartująca grę
 const restartButton = document.getElementById('restartButton');

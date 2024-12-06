@@ -1,52 +1,60 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pl">
-    <head> 
-        <meta charset="utf-8">
-         <title>Air Combat</title>
-         <link rel="stylesheet" href="style.css">
-         </head>
-    <body> 
-        <div id="blocker">
-            <div id="instructions">
-                <p style="font-size:36px">
-                    Kliknij, aby zagrać
-                </p>
-                <p>
-                    Unik: AD <br>
-                    Przyśpieszenie: W<br>
-                    Strzał: Spacja<br>
-                    Rakieta: Shift<br>
-                    Obrót: Myszka<br>
-                </p>
-            </div>
+<head> 
+    <meta charset="utf-8">
+    <title>Air Combat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body> 
+    <div id="blocker">
+        <div id="instructions">
+            <p style="font-size:36px">
+                Kliknij, aby zagrać
+            </p>
+            <p>
+                Unik: AD <br>
+                Przyśpieszenie: W<br>
+                Strzał: Spacja<br>
+                Rakieta: Shift<br>
+                Obrót: Myszka<br>
+            </p>
         </div>
-        <div id="health-bar-container">
-            <div id="health-bar"> <p id="bar"> ŻYCIE </p> </div>
-        </div>
-        <div id="fuel-bar-container">
-            <div id="fuel-bar"> <p id="bar"> PALIWO </p> </div>
-        </div>
-        <div id="shoot-bar-container">
-           <div id="shoot-bar"> <p id="bar"> AMUNICJA </p> </div>
-        </div>
-        <div id="rocket-icons">
-            <img src="rocket.png" class="rocket-icon" id="rocket1">
-            <img src="rocket.png" class="rocket-icon" id="rocket2">
-        </div>  
-        <div id="cooldown"></div> 
-        <canvas id="radar"></canvas>
+    </div>
+    <div id="health-bar-container">
+        <div id="health-bar"> <p id="bar"> ŻYCIE </p> </div>
+    </div>
+    <div id="fuel-bar-container">
+        <div id="fuel-bar"> <p id="bar"> PALIWO </p> </div>
+    </div>
+    <div id="shoot-bar-container">
+       <div id="shoot-bar"> <p id="bar"> AMUNICJA </p> </div>
+    </div>
+    <div id="rocket-icons">
+        <img src="rocket.png" class="rocket-icon" id="rocket1">
+        <img src="rocket.png" class="rocket-icon" id="rocket2">
+    </div>  
+    <div id="cooldown"></div> 
+    <canvas id="radar"></canvas>
 
-        <div id="gameover">
-            <h1>Game Over</h1>
-            <button id="restartButton">Restart</button>
-        </div>
+    <div id="gameover">
+        <h1>Game Over</h1>
+        <button id="restartButton">Restart</button>
+    </div>
 
-        <div id="level-completed">
-            <h1>Level 1 Completed</h1>
-            <button id="nextLevelButton">Next Level</button>
-        </div>
-
-        <script type="module" src="/main.js"></script>
-        
-    </body>
+    <div id="level-completed">
+        <h1>Level Completed</h1>
+        <button id="nextLevelButton">Next Level</button>
+        <button id="shop">Shop</button>
+    </div>
+    <!-- Ukryty sklep -->
+    <div id="shop-screen" style="display: none;">
+        <h1>Shop</h1>
+        <button id="buyHealth">Buy Health</button>
+        <button id="buySpeed">Buy Speed</button>
+        <button id="buyAmmo">Buy Ammo</button>
+        <button id="exitShop">Exit Shop</button>
+    </div>
+    
+    <script type="module" src="/main.js"></script>
+</body>
 </html>
