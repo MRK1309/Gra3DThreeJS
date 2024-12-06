@@ -76,6 +76,10 @@ function animate() {
             tower.updateCollision(player, scene)
         }
 
+        if (currentLevel == 4){
+            scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
+        }
+
         // Obsługa sterowania
         player.useControls(controls, scene, opponents)
 

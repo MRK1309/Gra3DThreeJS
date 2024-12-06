@@ -36,6 +36,7 @@ export function createWater() {
         sunColor: 0xffffff,
         waterColor: 0x001e0f,
         distortionScale: 3.7,
+        fog: true
     });
 
     water.rotation.x = Math.PI * - 0.5;
