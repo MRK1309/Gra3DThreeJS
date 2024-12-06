@@ -169,6 +169,17 @@ function animate() {
         
         // Animacja wody
         water.material.uniforms['time'].value += 1.0 / 60.0;
+
+        // Miganie przy małej ilości życia
+        if (player.health <= 8) {
+            blinkIntensity += 0.005 * blinkDirection; // jak szybko miga
+            if (blinkIntensity >= 0.4) blinkDirection = -1; // górna granica
+            if (blinkIntensity <= 0.1) blinkDirection = 1; // dolna granica
+
+            redOverlayMaterial.opacity = blinkIntensity;
+        } else {
+            redOverlayMaterial.opacity = 0;
+        }
     }
     renderer.render(scene, camera);
 }
@@ -197,3 +208,17 @@ scene.add(ambientLight);
 
 const directionalLight = createLight();
 scene.add(directionalLight);
+
+// Miganie
+const redOverlayGeometry = new THREE.PlaneGeometry(5, 2);
+const redOverlayMaterial = new THREE.MeshBasicMaterial({
+    color: 0xff0000,
+    transparent: true,
+    opacity: 0,
+});
+const redOverlay = new THREE.Mesh(redOverlayGeometry, redOverlayMaterial);
+redOverlay.position.z = -1;
+camera.add(redOverlay);
+
+let blinkIntensity = 0.1;
+let blinkDirection = 1;
