@@ -69,11 +69,13 @@ export function addOpponent(){
             opponents.forEach(opponent => {
                 if (opponent !== this) {
                     const distanceToOpponent = this.model.position.distanceTo(opponent.model.position);
-    
+        
                     if (distanceToOpponent < 25) { 
-                        const directionToOpponent = new THREE.Vector3().subVectors(opponent.model.position, this.model.position).normalize();
-                        direction = directionToOpponent.negate();
-                        this.model.position.add(direction.multiplyScalar(offset));
+                        if (opponent.health > 0){
+                            const directionToOpponent = new THREE.Vector3().subVectors(opponent.model.position, this.model.position).normalize();
+                            direction = directionToOpponent.negate();
+                            this.model.position.add(direction.multiplyScalar(offset));
+                        }
                     }
                 }
             });
@@ -140,12 +142,21 @@ export function addOpponent(){
             const opponentModelcontainer = new THREE.Object3D();
             const opponentBoundingBox = new THREE.Box3();
             const loader = new GLTFLoader();
+
+            let url;
+            if (this.type == "kamikaze") url = '/kamikaze.glb';
+            else url = '/samolot_przeciwnik.glb';
+            
     
-            loader.load('/samolot_przeciwnik.glb', (gltf) => {
+            loader.load(url, (gltf) => {
                 const opponentModel = gltf.scene;
+
+                if (this.type == "kamikaze")
+                    opponentModel.scale.set(150, 150, 150)
+
                 opponentModel.rotation.y = Math.PI;
                 opponentModelcontainer.add(opponentModel);
-        
+
                 opponentBoundingBox.setFromObject(opponentModelcontainer);
             });
     
@@ -218,7 +229,7 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
             if (numberOfOpponents == 7){
                 if ([1, 3, 5].includes(createdOpponents)){
                     opponent.type = "kamikaze"
-                    opponent.speed = 0.3;
+                    opponent.speed = 0.4;
                 }
             }
             opponent.loadModel();

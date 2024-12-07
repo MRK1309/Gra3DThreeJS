@@ -10,7 +10,6 @@ import { setupRadar, updateRadar } from './radar';
 import { addTower } from './tower';
 
 
-
 // Przygotowanie sceny
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -77,7 +76,7 @@ function animate() {
         }
 
         if (currentLevel == 4){
-            scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
+            // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
         }
 
         // Obsługa sterowania
