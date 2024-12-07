@@ -7,11 +7,13 @@ const material2 = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 
 export function addOpponent(){
     const opponent = {
+        type: "standard",
         model: new THREE.Object3D(), 
         boundingBox: new THREE.Box3(), 
         health: 10,
         projectiles: [],
         damage: 1,
+        speed: 0.1,
         healthBar: new THREE.Mesh(),
         healthBarContainer: new THREE.Mesh(),
         hit: new THREE.Mesh(geometry, material2),
@@ -26,25 +28,30 @@ export function addOpponent(){
             const distanceToModel = modelPosition.distanceTo(this.model.position);
         
             let direction = new THREE.Vector3();
-            const offset = 0.1;
         
             const turnAroundDistance = 25; 
             const chaseDistance = 35;      
         
-            if (this.isTurningAround) {
-                if (distanceToModel > chaseDistance) {
-                    this.isTurningAround = false;
+            if (this.type == "standard"){
+                if (this.isTurningAround) {
+                    if (distanceToModel > chaseDistance) {
+                        this.isTurningAround = false;
+                    } else {
+                        direction = directionToModel.negate();
+                        this.model.position.add(direction.multiplyScalar(this.speed));
+                    }
                 } else {
-                    direction = directionToModel.negate();
-                    this.model.position.add(direction.multiplyScalar(offset));
+                    if (distanceToModel < turnAroundDistance) {
+                        this.isTurningAround = true;
+                    } else {
+                        direction = directionToModel;
+                        this.model.position.add(direction.multiplyScalar(this.speed));
+                    }
                 }
-            } else {
-                if (distanceToModel < turnAroundDistance) {
-                    this.isTurningAround = true;
-                } else {
-                    direction = directionToModel;
-                    this.model.position.add(direction.multiplyScalar(offset));
-                }
+            } 
+            else{
+                direction = directionToModel;
+                this.model.position.add(direction.multiplyScalar(this.speed));
             }
         
             const turnSpeed = 0.1;
@@ -207,6 +214,13 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
 
         if (controls.isLocked) {
             const opponent = addOpponent();
+
+            if (numberOfOpponents == 7){
+                if ([1, 3, 5].includes(createdOpponents)){
+                    opponent.type = "kamikaze"
+                    opponent.speed = 0.3;
+                }
+            }
             opponent.loadModel();
 
             let position;

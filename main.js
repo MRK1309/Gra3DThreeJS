@@ -5,7 +5,7 @@ import { createGround, createLight, createSky, createWater } from './environment
 import { setupControls } from './controls';
 import { addPlayer } from './player';
 import { createOpponents } from './opponent';
-import { getLevels, gameOver, levelCompleted } from './levels';
+import { getLevels, gameOver, levelCompleted, basePlayer } from './levels';
 import { setupRadar, updateRadar } from './radar';
 import { addTower } from './tower';
 
@@ -87,7 +87,7 @@ function animate() {
         player.boundingBox.setFromObject(player.model);
 
         // Aktualizacja wszelkich pasków
-        updateBars(player.shootCount, player.fuel, player.health);
+        updateBars(player.shootCount, player.fuel, player.health, basePlayer());
 
         // Aktualizacja ikonek rakiet
         updateRocketIcons(player.availableRockets)
@@ -129,8 +129,10 @@ function animate() {
             
             if (scene.children.includes(opponent.model)) {
                 // Strzelanie przeciwnika
-                if (opponent.model.position.distanceTo(player.model.position) < 80 && opponent.model.position.distanceTo(player.model.position) > 20)
-                    opponent.fireProjectile(scene);
+                if (opponent.model.position.distanceTo(player.model.position) < 80 && opponent.model.position.distanceTo(player.model.position) > 20){
+                    if (opponent.type == "standard")
+                        opponent.fireProjectile(scene);
+                }
 
                 // Kolizja przeciwnika z graczem
                 if (player.boundingBox.containsPoint(opponent.model.position)) {
@@ -162,13 +164,15 @@ function animate() {
 
                 // Wyświetlenie ekranu ukończenia poziomu i reset właściwości
                 levelCompleted(scene, player, renderer, opponents)
+                controls.unlock();
                 return;
             }
         }
 
         // Pauza gry, gdy poziom został ukończony
         const levelCompletedScreen = document.getElementById('level-completed');
-        if(levelCompletedScreen.style.display == 'block')
+        const shopScreen = document.getElementById('shop-screen');
+        if(levelCompletedScreen.style.display == 'block' || shopScreen.style.display == 'block')
             controls.unlock();
         
         // Animacja wody
