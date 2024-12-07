@@ -35,7 +35,7 @@ const levels = [
         started: false
     },
     {   // 5
-        numberOfOpponents: 6,
+        numberOfOpponents: 7,
         destroyedOpponents: 0,
         spawnTime: 4500,
         damage: 2,
@@ -54,7 +54,7 @@ function cleanLevel(player, opponents, scene){
 
     player.health = base.health
     player.fuel = base.fuel
-    player.shootCount = base.shootCount
+    player.shootCount = base.ammunition
     player.availableRockets = base.availableRockets
 
     scene.remove(player.hit)
@@ -108,7 +108,7 @@ export function levelCompleted(scene, player, renderer, opponents) {
 
     // Obsługa zakupu zdrowia
     buyHealthButton.addEventListener('click', () => {
-        player.health += 5; // Dodaj 5 do zdrowia gracza
+        base.health += 5; // Dodaj 5 do zdrowia gracza
         console.log(`Player health increased to: ${player.health}`);
     });
 
@@ -120,8 +120,8 @@ export function levelCompleted(scene, player, renderer, opponents) {
 
     // Obsługa zakupu amunicji
     buyAmmoButton.addEventListener('click', () => {
+        base.ammunition += 10; // Dodaj 10 do amunicji gracza
         player.ammunition += 10; // Dodaj 10 do amunicji gracza
-        player.shootCount = player.ammunition; // Ustaw bieżącą liczbę pocisków na nową wartość
         console.log(`Player ammunition increased to: ${player.ammunition}`);
     });
 }
@@ -139,4 +139,8 @@ export function gameOver(scene, modelContainer, renderer) {
     
     gameOverScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
+}
+
+export function basePlayer(){
+    return base;
 }

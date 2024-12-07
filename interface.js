@@ -53,17 +53,17 @@ export function setupInterface(controls) {
     });
 }
 
-export function updateBars(shootCount, fuel, health) {
+export function updateBars(shootCount, fuel, health, base) {
     // Aktualizacja strzelania
-    const shootPercentage = Math.max((shootCount / player.ammunition) * 100, 0);
+    const shootPercentage = Math.max((shootCount / base.ammunition) * 100, 0);
     shootBar.style.width = `${shootPercentage}%`;
 
     // Aktualizacja paska paliwa
-    const fuelPercentage = Math.max((fuel / player.fuel) * 100, 0);
+    const fuelPercentage = Math.max((fuel / base.fuel) * 100, 0);
     fuelBar.style.width = `${fuelPercentage}%`;
 
     // Aktualizacja paska życia
-    const healthPercentage = Math.max((health / player.health) * 100, 0);
+    const healthPercentage = Math.max((health / base.health) * 100, 0);
     healthBar.style.width = `${healthPercentage}%`;
 }
 
