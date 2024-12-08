@@ -2,6 +2,7 @@ import { addPlayer } from './player';
 
 const gameOverScreen = document.getElementById('gameover');
 const levelCompletedScreen = document.getElementById('level-completed');
+const gameCompletedScreen = document.getElementById('game-completed');
 const base = addPlayer()
 
 // Lista poziomów gry
@@ -139,6 +140,19 @@ export function gameOver(scene, modelContainer, renderer) {
     
     gameOverScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
+}
+
+// Funkcja wyświetlająca ekran ukończenia gry
+export function gameCompleted(scene, modelContainer, renderer) {
+    scene.remove(modelContainer);
+    
+    gameCompletedScreen.style.display = 'block';
+    cancelAnimationFrame(renderer.domElement);
+
+    const restartButton = document.getElementById('restartButton2');
+    restartButton.addEventListener('click', () => {
+    location.reload();
+});
 }
 
 export function basePlayer(){

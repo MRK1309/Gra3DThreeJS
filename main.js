@@ -5,7 +5,7 @@ import { createGround, createLight, createSky, createWater } from './environment
 import { setupControls } from './controls';
 import { addPlayer } from './player';
 import { createOpponents } from './opponent';
-import { getLevels, gameOver, levelCompleted, basePlayer } from './levels';
+import { getLevels, gameOver, levelCompleted, basePlayer, gameCompleted } from './levels';
 import { setupRadar, updateRadar } from './radar';
 import { addTower } from './tower';
 
@@ -158,7 +158,7 @@ function animate() {
 
             if(currentLevel >= levels.length){
                 controls.unlock();
-                gameOver(scene, player.model, renderer); // tymczasowo
+                gameCompleted(scene, player.model, renderer);
                 return;
             }else{
                 // Zmiana poziomu na kolejny

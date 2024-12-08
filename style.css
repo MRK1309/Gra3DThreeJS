@@ -192,3 +192,16 @@ body {
   padding: 20px;
   border-radius: 10px;
 }
+
+#game-completed{
+  display: none;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  color: black;
+  background: rgb(202, 200, 42);
+  text-align: center;
+}
