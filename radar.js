@@ -43,7 +43,11 @@ export function updateRadar(player, opponents, radarContext, radarSize) {
         const radarX = radarCenter + Math.cos(angle) * (distance / radarRange) * radarCenter;
         const radarY = radarCenter + Math.sin(angle) * (distance / radarRange) * radarCenter;
 
-        radarContext.fillStyle = 'red'; // Kolor przeciwnika
+        if (opponent.type == "kamikaze")
+            radarContext.fillStyle = 'black';
+        else
+            radarContext.fillStyle = 'red'; // Kolor przeciwnika
+        
         radarContext.beginPath();
         radarContext.arc(radarX, radarY, 3, 0, 2 * Math.PI);
         radarContext.fill();
