@@ -19,6 +19,8 @@ const rocket1 = document.getElementById('rocket1');
 const rocket2 = document.getElementById('rocket2');
 //Radar
 const radar = document.getElementById('radar');
+//Liczba przeciwników
+const opponentsCounter = document.getElementById('opponents');
 
 export function setupInterface(controls) {
     document.body.addEventListener('click', function () {
@@ -34,6 +36,7 @@ export function setupInterface(controls) {
         rocket1.style.display = 'block'
         rocket2.style.display = 'block'
         radar.style.display = 'block'
+        opponentsCounter.style.display = 'block'
         controls.lock();
     }, false);
     
@@ -50,6 +53,7 @@ export function setupInterface(controls) {
         rocket1.style.display = 'none'
         rocket2.style.display = 'none'
         radar.style.display = 'none'
+        opponentsCounter.style.display = 'none'
     });
 }
 
@@ -79,4 +83,8 @@ export function updateRocketIcons(availableRockets) {
         rocket2.src = "rocket.png";
         rocket1.src = "rocket.png";
     }
+}
+
+export function updateOponnentsCounter(level){
+    opponentsCounter.textContent = `Liczba przeciwników: ${level.numberOfOpponents+1 - level.destroyedOpponents}`;
 }

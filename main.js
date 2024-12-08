@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-import { setupInterface, updateBars, updateRocketIcons } from './interface';
+import { setupInterface, updateBars, updateOponnentsCounter, updateRocketIcons } from './interface';
 import { createGround, createLight, createSky, createWater } from './environment';
 import { setupControls } from './controls';
 import { addPlayer } from './player';
@@ -93,6 +93,9 @@ function animate() {
 
         // Aktualizacja radaru
         updateRadar(player, opponents, radarContext, radarSize);
+
+        // Aktualizacja licznika przeciwników
+        updateOponnentsCounter(level);
 
         // Aktualizacja pocisków i kolizji
         player.updateCollision(opponents, scene)
