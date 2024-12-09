@@ -146,17 +146,12 @@ export function addOpponent(){
             let url;
             if (this.type == "kamikaze") url = '/kamikaze.glb';
             else url = '/samolot_przeciwnik.glb';
-            
     
             loader.load(url, (gltf) => {
                 const opponentModel = gltf.scene;
-
-                if (this.type == "kamikaze")
-                    opponentModel.scale.set(150, 150, 150)
-
                 opponentModel.rotation.y = Math.PI;
+                
                 opponentModelcontainer.add(opponentModel);
-
                 opponentBoundingBox.setFromObject(opponentModelcontainer);
             });
     
@@ -226,6 +221,7 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
         if (controls.isLocked) {
             const opponent = addOpponent();
 
+            // Jeśli to poziom 5, to stwórz kamikaze
             if (numberOfOpponents == 7){
                 if ([1, 3, 5].includes(createdOpponents)){
                     opponent.type = "kamikaze"

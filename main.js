@@ -37,7 +37,7 @@ controls.addEventListener('change', () => {
 
 // Poziom gry
 const levels = getLevels()
-let currentLevel = 0;
+let currentLevel = 4;
 let level = levels[currentLevel]
 
 // Przeciwnicy
@@ -68,6 +68,7 @@ function animate() {
             createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
         }
 
+        // Dodanie wieży od 4 poziomu
         if (currentLevel >= 3){
             scene.add(tower.model)
 
@@ -75,6 +76,7 @@ function animate() {
             tower.updateCollision(player, scene)
         }
 
+        // Dodanie mgły w 5 poziomie
         if (currentLevel == 4){
             // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
         }
@@ -156,6 +158,7 @@ function animate() {
         if (level.destroyedOpponents>=level.numberOfOpponents+1) {
             currentLevel++;
 
+            // Ukończenie gry
             if(currentLevel >= levels.length){
                 controls.unlock();
                 gameCompleted(scene, player.model, renderer);
