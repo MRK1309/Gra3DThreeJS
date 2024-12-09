@@ -37,7 +37,7 @@ controls.addEventListener('change', () => {
 
 // Poziom gry
 const levels = getLevels()
-let currentLevel = 4;
+let currentLevel = 0;
 let level = levels[currentLevel]
 
 // Przeciwnicy
