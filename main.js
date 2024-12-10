@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls';
-import { setupInterface, updateBars, updateOponnentsCounter, updateRocketIcons } from './interface';
-import { createGround, createLight, createSky, createWater } from './environment';
+import { setupInterface, updateInterface } from './interface';
+import { createEnvironment } from './environment';
 import { setupControls } from './controls';
 import { addPlayer } from './player';
-import { createOpponents } from './opponent';
-import { getLevels, gameOver, levelCompleted, basePlayer, gameCompleted } from './levels';
+import { getLevels, handleLevels, gameOver, levelCompleted, gameCompleted } from './levels';
 import { setupRadar, updateRadar } from './radar';
-import { addTower } from './tower';
 
 
 // Przygotowanie sceny
@@ -42,7 +40,6 @@ let level = levels[currentLevel]
 
 // Przeciwnicy
 const opponents = [];
-let spawnInterval;
 
 // Sterowanie (controls.js);
 setupControls();
@@ -56,31 +53,10 @@ const { radarContext, radarSize } = setupRadar();
 //Zmniejszanie paliwa
 player.fuelConsume(controls);
 
-// Model wieży 
-const tower = addTower();
-tower.loadModel()
-
 function animate() {
     if (controls.isLocked) {
-        // Rozpoczęcie poziomu
-        if(level.started == false){
-            level.started = true
-            createOpponents(1, opponents, player, controls, scene, 0, level.damage)
-            spawnInterval = createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
-        }
-
-        // Dodanie wieży od 4 poziomu
-        if (currentLevel >= 3){
-            scene.add(tower.model)
-
-            tower.fireProjectile(scene, player)
-            tower.updateCollision(player, scene)
-        }
-
-        // Dodanie mgły w 5 poziomie
-        if (currentLevel == 4){
-            // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
-        }
+        // Obsługa poziomów
+        handleLevels(level, currentLevel, player, opponents, controls, scene)
 
         // Obsługa sterowania
         player.useControls(controls, scene, opponents)
@@ -88,28 +64,14 @@ function animate() {
         // Aktualizacja hitboxu gracza
         player.boundingBox.setFromObject(player.model);
 
-        // Aktualizacja wszelkich pasków
-        updateBars(player.shootCount, player.fuel, player.health, basePlayer());
-
-        // Aktualizacja ikonek rakiet
-        updateRocketIcons(player.availableRockets)
+        // Aktualizacja pocisków i kolizji
+        player.updateCollision(opponents, scene)
 
         // Aktualizacja radaru
         updateRadar(player, opponents, radarContext, radarSize);
 
-        // Aktualizacja licznika przeciwników
-        updateOponnentsCounter(level);
-
-        // Aktualizacja pocisków i kolizji
-        player.updateCollision(opponents, scene)
-
-        // Zakończenie gry (brak paliwa lub zdrowia)
-        if (player.fuel <= 0 || player.health <= 0) {
-            controls.unlock();
-            gameOver(scene, player, opponents, level, renderer);
-            clearInterval(spawnInterval);
-            return;
-        }
+        // Aktualizacja interfejsu
+        updateInterface(player, level, controls)
 
         // Zaktualizuj przeciwników
         opponents.forEach(opponent => {
@@ -149,6 +111,7 @@ function animate() {
                     player.health = 0;
                 }
             }
+            
             // Zliczanie zniszczonych przeciwników
             if (opponent.health <= 0 && !opponent.isDestroyed) {
                 level.destroyedOpponents += 1;
@@ -156,34 +119,24 @@ function animate() {
                 console.log(level.destroyedOpponents);
             }
         });
+
+         // Zakończenie gry (brak paliwa lub zdrowia)
+         if (player.fuel <= 0 || player.health <= 0) 
+            gameOver(scene, player, opponents, level, renderer);
+
         // Przejście poziomu
         if (level.destroyedOpponents>=level.numberOfOpponents+1) {
             currentLevel++;
 
             // Ukończenie gry
-            if(currentLevel >= levels.length){
-                controls.unlock();
-                gameCompleted(scene, player.model, renderer);
-                return;
-            }else{
+            if(currentLevel >= levels.length)
+                gameCompleted(renderer);
+            else{
                 // Zmiana poziomu na kolejny
                 level = levels[currentLevel]
-
-                // Wyświetlenie ekranu ukończenia poziomu i reset właściwości
                 levelCompleted(scene, player, renderer, opponents)
-                controls.unlock();
-                return;
             }
         }
-
-        // Pauza gry, gdy poziom został ukończony
-        const levelCompletedScreen = document.getElementById('level-completed');
-        const shopScreen = document.getElementById('shop-screen');
-        if(levelCompletedScreen.style.display == 'block' || shopScreen.style.display == 'block')
-            controls.unlock();
-        
-        // Animacja wody
-        water.material.uniforms['time'].value += 1.0 / 60.0;
 
         // Miganie przy małej ilości życia
         if (player.health <= 8) {
@@ -195,34 +148,15 @@ function animate() {
         } else {
             redOverlayMaterial.opacity = 0;
         }
+
+        // Animacja wody
+        water.material.uniforms['time'].value += 1.0 / 60.0;
     }
     renderer.render(scene, camera);
 }
 
-// Mapa
-const mapContainer = new THREE.Object3D();
-mapContainer.position.y = -55;
-scene.add(mapContainer);
-
-// Woda
-const water = createWater();
-mapContainer.add(water);
-
-// Ziemia
-const ground = createGround()
-mapContainer.add(ground);
-ground.position.y += 0.185;
-
-// Niebo
-const sky = createSky();
-scene.add(sky);
-
-// Światło
-const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-scene.add(ambientLight);
-
-const directionalLight = createLight();
-scene.add(directionalLight);
+// Otoczenie (stałą water do animacji wody)
+const water = createEnvironment(scene)
 
 // Miganie
 const redOverlayGeometry = new THREE.PlaneGeometry(5, 2);

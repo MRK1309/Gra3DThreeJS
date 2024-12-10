@@ -1,9 +1,14 @@
-import { addPlayer } from './player';
-const player = addPlayer()
+import { basePlayer } from './levels';
 
 // Plansza początkowa
 const blocker = document.getElementById('blocker');
 const instructions = document.getElementById('instructions');
+//Plansze przejściowe
+const levelCompletedScreen = document.getElementById('level-completed');
+const shopScreen = document.getElementById('shop-screen');
+const gameOverScreen = document.getElementById('gameover');
+const gameCompletedScreen = document.getElementById('game-completed');
+const screens = [levelCompletedScreen, shopScreen, gameOverScreen, gameCompletedScreen]
 //Pasek życia
 const healthBar = document.getElementById('health-bar');
 const healthBarContainer = document.getElementById('health-bar-container');
@@ -19,7 +24,7 @@ const rocket1 = document.getElementById('rocket1');
 const rocket2 = document.getElementById('rocket2');
 //Radar
 const radar = document.getElementById('radar');
-//Liczba przeciwników
+//Licznik przeciwników
 const opponentsCounter = document.getElementById('opponents');
 
 export function setupInterface(controls) {
@@ -57,7 +62,7 @@ export function setupInterface(controls) {
     });
 }
 
-export function updateBars(shootCount, fuel, health, base) {
+function updateBars(shootCount, fuel, health, base) {
     // Aktualizacja strzelania
     const shootPercentage = Math.max((shootCount / base.ammunition) * 100, 0);
     shootBar.style.width = `${shootPercentage}%`;
@@ -71,7 +76,7 @@ export function updateBars(shootCount, fuel, health, base) {
     healthBar.style.width = `${healthPercentage}%`;
 }
 
-export function updateRocketIcons(availableRockets) {
+function updateRocketIcons(availableRockets) {
     const rocket2 = document.getElementById('rocket2');
     const rocket1 = document.getElementById('rocket1');
 
@@ -85,6 +90,23 @@ export function updateRocketIcons(availableRockets) {
     }
 }
 
-export function updateOponnentsCounter(level){
+function updateOponnentsCounter(level){
     opponentsCounter.textContent = `Liczba przeciwników: ${level.numberOfOpponents+1 - level.destroyedOpponents}`;
+}
+
+export function updateInterface(player, level, controls){
+    // Aktualizacja wszelkich pasków
+    updateBars(player.shootCount, player.fuel, player.health, basePlayer());
+
+    // Aktualizacja ikonek rakiet
+    updateRocketIcons(player.availableRockets)
+
+    // Aktualizacja licznika przeciwników
+    updateOponnentsCounter(level);
+
+    // Pauza gry, gdy jakaś plansza wyświetlona
+    screens.forEach(i => {
+        if(i.style.display == 'block')
+            controls.unlock();
+    });
 }

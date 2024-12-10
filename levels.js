@@ -1,51 +1,86 @@
+import { createOpponents } from './opponent';
 import { addPlayer } from './player';
+import { store } from './store';
+import { addTower } from './tower';
 
-const gameOverScreen = document.getElementById('gameover');
 const levelCompletedScreen = document.getElementById('level-completed');
+const shopScreen = document.getElementById('shop-screen');
+const gameOverScreen = document.getElementById('gameover');
 const gameCompletedScreen = document.getElementById('game-completed');
+
+const nextLevelButton = document.getElementById('nextLevelButton');
+const shopButton = document.getElementById('shop');
+const restartButton = document.getElementById('restartButton');
+const menuButton = document.getElementById('menu');
+
+let spawnInterval;
 const base = addPlayer()
+const tower = addTower();
+tower.loadModel()
 
 // Lista poziomów gry
-const levels = [
-    {   // 1
-        numberOfOpponents: 4,
-        destroyedOpponents: 0,
-        spawnTime: 5000,
-        damage: 1,
-        started: false
-    },
-    {   // 2
-        numberOfOpponents: 6,
-        destroyedOpponents: 0,
-        spawnTime: 4500,
-        damage: 1,
-        started: false
-    },
-    {   // 3
-        numberOfOpponents: 6,
-        destroyedOpponents: 0,
-        spawnTime: 4500,
-        damage: 2,
-        started: false
-    },
-    {   // 4
-        numberOfOpponents: 6,
-        destroyedOpponents: 0,
-        spawnTime: 4500,
-        damage: 2,
-        started: false
-    },
-    {   // 5
-        numberOfOpponents: 7,
-        destroyedOpponents: 0,
-        spawnTime: 4500,
-        damage: 2,
-        started: false
-    },
-];
-
 export function getLevels(){
+    const levels = [
+        {   // 1
+            numberOfOpponents: 4,
+            destroyedOpponents: 0,
+            spawnTime: 5000,
+            damage: 1,
+            started: false
+        },
+        {   // 2
+            numberOfOpponents: 6,
+            destroyedOpponents: 0,
+            spawnTime: 4500,
+            damage: 1,
+            started: false
+        },
+        {   // 3
+            numberOfOpponents: 6,
+            destroyedOpponents: 0,
+            spawnTime: 4500,
+            damage: 2,
+            started: false
+        },
+        {   // 4
+            numberOfOpponents: 6,
+            destroyedOpponents: 0,
+            spawnTime: 4500,
+            damage: 2,
+            started: false
+        },
+        {   // 5
+            numberOfOpponents: 7,
+            destroyedOpponents: 0,
+            spawnTime: 4500,
+            damage: 2,
+            started: false
+        },
+    ];
+
     return levels;
+}
+
+export function handleLevels(level, currentLevel, player, opponents, controls, scene){
+    // Rozpoczęcie poziomu
+    if(level.started == false){
+        level.started = true
+        createOpponents(1, opponents, player, controls, scene, 0, level.damage)
+        spawnInterval = createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
+    }
+
+    // Dodanie wieży od 4 poziomu
+    if (currentLevel >= 3){
+        scene.add(tower.model)
+
+        tower.fireProjectile(scene, player)
+        tower.updateCollision(player, scene)
+    }
+
+    // Dodanie mgły w 5 poziomie
+    if (currentLevel == 4){
+        // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
+    }
 }
 
 // Funkcja czyszcząca mapę itd.
@@ -70,6 +105,8 @@ function cleanLevel(player, opponents, scene){
         });
         scene.remove(opponent.hit)
     });
+
+    scene.add(player.model);
 }
 
 // Funkcja wyświetlająca ekran "Level Completed"
@@ -79,58 +116,26 @@ export function levelCompleted(scene, player, renderer, opponents) {
     levelCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
-    const shopButton = document.getElementById('shop');
-    const shopScreen = document.getElementById('shop-screen');
-    const exitShopButton = document.getElementById('exitShop');
-    const nextLevelButton = document.getElementById('nextLevelButton');
-    const buyHealthButton = document.getElementById('buyHealth');
-    const buySpeedButton = document.getElementById('buySpeed');
-    const buyAmmoButton = document.getElementById('buyAmmo');
-
     // Obsługa przycisku "Next Level"
     nextLevelButton.addEventListener('click', () => {
-        // Reset mapy i gracza
         cleanLevel(player, opponents, scene);
 
         levelCompletedScreen.style.display = 'none';
-        scene.add(player.model);
     });
 
     // Funkcja pokazująca sklep
     shopButton.addEventListener('click', () => {
         shopScreen.style.display = 'block';
+        store(base, player);
+
         levelCompletedScreen.style.display = 'none';
-    });
-
-    // Funkcja ukrywająca sklep
-    exitShopButton.addEventListener('click', () => {
-        shopScreen.style.display = 'none';
-        levelCompletedScreen.style.display = 'block';
-    });
-
-    // Obsługa zakupu zdrowia
-    buyHealthButton.addEventListener('click', () => {
-        base.health += 5; // Dodaj 5 do zdrowia gracza
-        console.log(`Player health increased to: ${player.health}`);
-    });
-
-    // Obsługa zakupu szybkości
-    buySpeedButton.addEventListener('click', () => {
-        player.speed += 0.05; // Dodaj 0.05 do szybkości gracza
-        console.log(`Player speed increased to: ${player.speed}`);
-    });
-
-    // Obsługa zakupu amunicji
-    buyAmmoButton.addEventListener('click', () => {
-        base.ammunition += 10; // Dodaj 10 do amunicji gracza
-        player.ammunition += 10; // Dodaj 10 do amunicji gracza
-        console.log(`Player ammunition increased to: ${player.ammunition}`);
     });
 }
 
 // Funkcja wyświetlająca ekran "Game Over"
 export function gameOver(scene, player, opponents, level, renderer) {
     scene.remove(player.model);
+    clearInterval(spawnInterval);
 
     opponents.forEach(opponent => {
         opponent.health = 0;
@@ -140,7 +145,6 @@ export function gameOver(scene, player, opponents, level, renderer) {
     gameOverScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
-    const restartButton = document.getElementById('restartButton');
     restartButton.addEventListener('click', () => {
         cleanLevel(player, opponents, scene);
 
@@ -152,19 +156,15 @@ export function gameOver(scene, player, opponents, level, renderer) {
         level.started = false
 
         gameOverScreen.style.display = 'none';
-        scene.add(player.model);
     });
 }
 
 // Funkcja wyświetlająca ekran ukończenia gry
-export function gameCompleted(scene, modelContainer, renderer) {
-    scene.remove(modelContainer);
-    
+export function gameCompleted(renderer) {
     gameCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
-    const restartButton = document.getElementById('restartButton2');
-    restartButton.addEventListener('click', () => {
+    menuButton.addEventListener('click', () => {
         location.reload();
     });
 }
