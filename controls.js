@@ -93,6 +93,8 @@ export function dodge(speed, controls) {
         if (!controls.isLocked)
             cooldown.style.display = "none";
     }); 
+
+    return cooldownInterval;
 }
 
 export function getControlStates() {

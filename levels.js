@@ -57,6 +57,7 @@ function cleanLevel(player, opponents, scene){
     player.fuel = base.fuel
     player.shootCount = base.ammunition
     player.availableRockets = base.availableRockets
+    clearInterval(player.cooldownInterval)
 
     scene.remove(player.hit)
     player.projectiles.forEach(projectile => {

@@ -21,6 +21,7 @@ export function addPlayer(){
         reloaded: true,
         availableRockets: 2,
         hit: new THREE.Mesh(geometry, material2),
+        cooldownInterval: null,
         
         // Zmniejszanie paliwa
         fuelConsume: function (controls) {
@@ -102,11 +103,11 @@ export function addPlayer(){
                 this.fuel -= this.fuelUsage; // Szybsze zużycie paliwa
             }
             if (right) {
-                dodge(this.speed * 2, controls);
+                this.cooldownInterval = dodge(this.speed * 2, controls);
                 this.fuel -= this.fuelUsage; // Szybsze zużycie paliwa
             }
             if (left) {
-                dodge(-this.speed * 2, controls);
+                this.cooldownInterval = dodge(-this.speed * 2, controls);
                 this.fuel -= this.fuelUsage; // Szybsze zużycie paliwa
             }
             if (fire) {
