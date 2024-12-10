@@ -127,19 +127,32 @@ export function levelCompleted(scene, player, renderer, opponents) {
     });
 }
 
-
-// Funkcja restartująca grę
-const restartButton = document.getElementById('restartButton');
-restartButton.addEventListener('click', () => {
-    location.reload();
-});
-
 // Funkcja wyświetlająca ekran "Game Over"
-export function gameOver(scene, modelContainer, renderer) {
-    scene.remove(modelContainer);
+export function gameOver(scene, player, opponents, level, renderer) {
+    scene.remove(player.model);
+
+    opponents.forEach(opponent => {
+        opponent.health = 0;
+        scene.remove(opponent.model)
+    })
     
     gameOverScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
+
+    const restartButton = document.getElementById('restartButton');
+    restartButton.addEventListener('click', () => {
+        cleanLevel(player, opponents, scene);
+
+        opponents.forEach(opponent => {
+            opponents.splice(opponent)
+        })
+
+        level.destroyedOpponents = 0;
+        level.started = false
+
+        gameOverScreen.style.display = 'none';
+        scene.add(player.model);
+    });
 }
 
 // Funkcja wyświetlająca ekran ukończenia gry
@@ -151,8 +164,8 @@ export function gameCompleted(scene, modelContainer, renderer) {
 
     const restartButton = document.getElementById('restartButton2');
     restartButton.addEventListener('click', () => {
-    location.reload();
-});
+        location.reload();
+    });
 }
 
 export function basePlayer(){

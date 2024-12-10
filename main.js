@@ -42,6 +42,7 @@ let level = levels[currentLevel]
 
 // Przeciwnicy
 const opponents = [];
+let spawnInterval;
 
 // Sterowanie (controls.js);
 setupControls();
@@ -65,7 +66,7 @@ function animate() {
         if(level.started == false){
             level.started = true
             createOpponents(1, opponents, player, controls, scene, 0, level.damage)
-            createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
+            spawnInterval = createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
         }
 
         // Dodanie wieży od 4 poziomu
@@ -105,7 +106,8 @@ function animate() {
         // Zakończenie gry (brak paliwa lub zdrowia)
         if (player.fuel <= 0 || player.health <= 0) {
             controls.unlock();
-            gameOver(scene, player.model, renderer);
+            gameOver(scene, player, opponents, level, renderer);
+            clearInterval(spawnInterval);
             return;
         }
 

@@ -251,4 +251,6 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
             createdOpponents++;
         }
     }, time);
+    
+    return interval;
 }
