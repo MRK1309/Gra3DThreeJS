@@ -125,7 +125,7 @@ function animate() {
             gameOver(scene, player, opponents, level, renderer);
 
         // Przejście poziomu
-        if (level.destroyedOpponents>=level.numberOfOpponents+1) {
+        if (level.destroyedOpponents >= level.numberOfOpponents+1 && player.health > 0) {
             currentLevel++;
 
             // Ukończenie gry
