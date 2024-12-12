@@ -120,20 +120,20 @@ function animate() {
             }
         });
 
-         // Zakończenie gry (brak paliwa lub zdrowia)
-         if (player.fuel <= 0 || player.health <= 0) 
+        // Zakończenie gry (brak paliwa lub zdrowia)
+        if (player.fuel <= 0 || player.health <= 0) 
             gameOver(scene, player, opponents, level, renderer);
 
         // Przejście poziomu
         if (level.destroyedOpponents >= level.numberOfOpponents+1 && player.health > 0) {
             currentLevel++;
+            level = levels[currentLevel]
 
             // Ukończenie gry
-            if(currentLevel >= levels.length)
-                gameCompleted(renderer);
+            if(currentLevel >= levels.length-1)
+                gameCompleted(level, player, opponents, scene, renderer);
             else{
                 // Zmiana poziomu na kolejny
-                level = levels[currentLevel]
                 levelCompleted(scene, player, renderer, opponents, level)
             }
         }

@@ -12,8 +12,10 @@ const nextLevelButton = document.getElementById('nextLevelButton');
 const shopButton = document.getElementById('shop');
 const restartButton = document.getElementById('restartButton');
 const menuButton = document.getElementById('menu');
+const bonusLevelButton = document.getElementById('bonusLevelButton');
 
 const newElement = document.getElementById('new');
+const bonusLevelInfo = document.getElementById("bonusLevelInfo")
 
 let spawnInterval;
 const base = addPlayer()
@@ -58,6 +60,13 @@ export function getLevels(){
             damage: 2,
             started: false
         },
+        {   // 6
+            numberOfOpponents: Infinity,
+            destroyedOpponents: 0,
+            spawnTime: 4500,
+            damage: 2,
+            started: false
+        },
     ];
 
     return levels;
@@ -82,6 +91,8 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
                     newElement.textContent = `Nowe zagrożenie: wieża. Niemożliwa do zniszczenia.`;
                 if (currentLevel == 4)
                     newElement.textContent = `Nowy typ przeciwnika: kamikaze`;
+                if (currentLevel == 5)
+                    newElement.textContent = `Zniszcz jak najwięcej przeciwników!`;
 
                 if (elapsedCooldown >= 5000) {
                     clearInterval(infoInterval);
@@ -94,7 +105,7 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
     }
 
     // Dodanie wieży od 4 poziomu
-    if (currentLevel >= 3){
+    if (currentLevel >= 3 && currentLevel < 5){
         scene.add(tower.model)
 
         tower.fireProjectile(scene, player)
@@ -104,6 +115,14 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
     // Dodanie mgły w 5 poziomie
     if (currentLevel == 4){
         // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
+    }
+
+    // Usunięcie wieży na dodatkowy poziom
+    if (currentLevel == 5){
+        scene.remove(tower.model)
+        tower.projectiles.forEach(projectile => {
+            scene.remove(projectile)
+        });
     }
 }
 
@@ -160,6 +179,7 @@ export function levelCompleted(scene, player, renderer, opponents, level) {
 
 // Funkcja wyświetlająca ekran "Game Over"
 export function gameOver(scene, player, opponents, level, renderer) {
+    level.started = true
     scene.remove(player.model);
     clearInterval(spawnInterval);
 
@@ -170,6 +190,10 @@ export function gameOver(scene, player, opponents, level, renderer) {
     
     gameOverScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
+
+    menuButton.addEventListener('click', () => {
+        location.reload();
+    });
 
     restartButton.addEventListener('click', () => {
         cleanLevel(player, opponents, scene);
@@ -183,15 +207,27 @@ export function gameOver(scene, player, opponents, level, renderer) {
 
         gameOverScreen.style.display = 'none';
     });
+
+    if(level.numberOfOpponents == Infinity)
+        bonusLevelInfo.textContent = `Liczba zniszczonych przeciwników: ${level.destroyedOpponents}`;
 }
 
 // Funkcja wyświetlająca ekran ukończenia gry
-export function gameCompleted(renderer) {
+export function gameCompleted(level, player, opponents, scene, renderer) {
+    level.started = true
+
     gameCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
     menuButton.addEventListener('click', () => {
         location.reload();
+    });
+
+    bonusLevelButton.addEventListener('click', () => {
+        cleanLevel(player, opponents, scene);
+
+        gameCompletedScreen.style.display = 'none';
+        level.started = false
     });
 }
 

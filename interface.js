@@ -91,7 +91,10 @@ function updateRocketIcons(availableRockets) {
 }
 
 function updateOponnentsCounter(level){
-    opponentsCounter.textContent = `Liczba przeciwników: ${level.numberOfOpponents+1 - level.destroyedOpponents}`;
+    if (level.numberOfOpponents == Infinity)
+        opponentsCounter.textContent = `Liczba zniszczonych przeciwników: ${level.destroyedOpponents}`;
+    else
+        opponentsCounter.textContent = `Liczba przeciwników: ${level.numberOfOpponents+1 - level.destroyedOpponents}`;
 }
 
 export function updateInterface(player, level, controls){

@@ -228,6 +228,12 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
                     opponent.speed = 0.4;
                 }
             }
+            if (numberOfOpponents == Infinity){
+                if ((createdOpponents+1) % 5 == 0){
+                    opponent.type = "kamikaze"
+                    opponent.speed = 0.4;
+                }
+            }
             opponent.loadModel();
 
             let position;
