@@ -13,6 +13,8 @@ const shopButton = document.getElementById('shop');
 const restartButton = document.getElementById('restartButton');
 const menuButton = document.getElementById('menu');
 
+const newElement = document.getElementById('new');
+
 let spawnInterval;
 const base = addPlayer()
 const tower = addTower();
@@ -67,6 +69,26 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
         level.started = true
         createOpponents(1, opponents, player, controls, scene, 0, level.damage)
         spawnInterval = createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
+
+        // Wyświetlenie informacji o zmianach w poziomie
+        if (controls.isLocked){
+            const cooldownStartTime = Date.now();
+            const infoInterval = setInterval(() => {
+                const elapsedCooldown = Date.now() - cooldownStartTime;
+                
+                if (currentLevel == 3)
+                    newElement.textContent = `Nowe zagrożenie: wieża. Niemożliwa do zniszczenia.`;
+                if (currentLevel == 4)
+                    newElement.textContent = `Nowy typ przeciwnika: kamikaze`;
+
+                if (elapsedCooldown >= 5000) {
+                    clearInterval(infoInterval);
+                    newElement.textContent = ``;
+                }
+                if (!controls.isLocked)
+                    newElement.textContent = ``;
+            }); 
+        }
     }
 
     // Dodanie wieży od 4 poziomu
@@ -110,7 +132,8 @@ function cleanLevel(player, opponents, scene){
 }
 
 // Funkcja wyświetlająca ekran "Level Completed"
-export function levelCompleted(scene, player, renderer, opponents) {
+export function levelCompleted(scene, player, renderer, opponents, level) {
+    level.started = true
     scene.remove(player.model);
     
     levelCompletedScreen.style.display = 'block';
@@ -121,6 +144,7 @@ export function levelCompleted(scene, player, renderer, opponents) {
         cleanLevel(player, opponents, scene);
 
         levelCompletedScreen.style.display = 'none';
+        level.started = false
     });
 
     // Funkcja pokazująca sklep
