@@ -76,6 +76,8 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
             const infoInterval = setInterval(() => {
                 const elapsedCooldown = Date.now() - cooldownStartTime;
                 
+                if (currentLevel == 2)
+                    newElement.textContent = `Zwiększono obrażenia zadawane przez przeciwników.`;
                 if (currentLevel == 3)
                     newElement.textContent = `Nowe zagrożenie: wieża. Niemożliwa do zniszczenia.`;
                 if (currentLevel == 4)
