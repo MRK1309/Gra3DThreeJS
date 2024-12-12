@@ -20,8 +20,9 @@ export function addPlayer(){
         projectiles: [],
         reloaded: true,
         availableRockets: 2,
+        reloadSpeed: 100,
+        money: 0,
         hit: new THREE.Mesh(geometry, material2),
-        cooldownInterval: null,
         
         // Zmniejszanie paliwa
         fuelConsume: function (controls) {
@@ -85,12 +86,14 @@ export function addPlayer(){
         // Przeładowanie broni
         reload: function (controls) {
             const interval = setInterval(() => {
-                if (this.shootCount != this.ammunition && controls.isLocked)
+                if (this.shootCount != this.ammunition && controls.isLocked) {
                     this.shootCount++;
+                }
         
-                if (this.shootCount == this.ammunition)
+                if (this.shootCount == this.ammunition) {
                     clearInterval(interval);
-            }, 100);
+                }
+            }, this.reloadSpeed);
         },
 
         // Obsługa sterowania
@@ -103,11 +106,11 @@ export function addPlayer(){
                 this.fuel -= this.fuelUsage; // Szybsze zużycie paliwa
             }
             if (right) {
-                this.cooldownInterval = dodge(this.speed * 2, controls);
+                dodge(this.speed * 2, controls);
                 this.fuel -= this.fuelUsage; // Szybsze zużycie paliwa
             }
             if (left) {
-                this.cooldownInterval = dodge(-this.speed * 2, controls);
+                dodge(-this.speed * 2, controls);
                 this.fuel -= this.fuelUsage; // Szybsze zużycie paliwa
             }
             if (fire) {

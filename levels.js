@@ -72,7 +72,10 @@ export function getLevels(){
     return levels;
 }
 
+export let currentLevelIndex;
+
 export function handleLevels(level, currentLevel, player, opponents, controls, scene){
+    currentLevelIndex = level;
     // Rozpoczęcie poziomu
     if(level.started == false){
         level.started = true
@@ -116,9 +119,8 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
     if (currentLevel == 4){
         // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
     }
-
-    // Usunięcie wieży na dodatkowy poziom
-    if (currentLevel == 5){
+     // Usunięcie wieży na dodatkowy poziom
+     if (currentLevel == 5){
         scene.remove(tower.model)
         tower.projectiles.forEach(projectile => {
             scene.remove(projectile)
@@ -154,9 +156,14 @@ function cleanLevel(player, opponents, scene){
 
 // Funkcja wyświetlająca ekran "Level Completed"
 export function levelCompleted(scene, player, renderer, opponents, level) {
-    level.started = true
+    level.started = true;
     scene.remove(player.model);
-    
+
+    // Oblicz zarobione pieniądze
+    const earnedMoney = player.health * 10;
+    base.money += earnedMoney; // Aktualizacja pieniędzy gracza
+    console.log(`Player earned ${earnedMoney} money. Total money: ${base.money}`);
+
     levelCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
@@ -165,7 +172,7 @@ export function levelCompleted(scene, player, renderer, opponents, level) {
         cleanLevel(player, opponents, scene);
 
         levelCompletedScreen.style.display = 'none';
-        level.started = false
+        level.started = false;
     });
 
     // Funkcja pokazująca sklep
@@ -206,8 +213,8 @@ export function gameOver(scene, player, opponents, level, renderer) {
         level.started = false
 
         gameOverScreen.style.display = 'none';
+        
     });
-
     if(level.numberOfOpponents == Infinity)
         bonusLevelInfo.textContent = `Liczba zniszczonych przeciwników: ${level.destroyedOpponents}`;
 }
@@ -215,17 +222,14 @@ export function gameOver(scene, player, opponents, level, renderer) {
 // Funkcja wyświetlająca ekran ukończenia gry
 export function gameCompleted(level, player, opponents, scene, renderer) {
     level.started = true
-
     gameCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
     menuButton.addEventListener('click', () => {
         location.reload();
     });
-
     bonusLevelButton.addEventListener('click', () => {
         cleanLevel(player, opponents, scene);
-
         gameCompletedScreen.style.display = 'none';
         level.started = false
     });
