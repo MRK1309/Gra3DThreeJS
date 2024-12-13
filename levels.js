@@ -18,6 +18,7 @@ const newElement = document.getElementById('new');
 const bonusLevelInfo = document.getElementById("bonusLevelInfo")
 
 let spawnInterval;
+let totalStars = 0;
 const tower = addTower();
 tower.loadModel()
 export const base = addPlayer()
@@ -162,6 +163,33 @@ export function levelCompleted(scene, player, renderer, opponents, level) {
     const earnedMoney = player.health * 10;
     base.money += earnedMoney; // Aktualizacja pieniędzy gracza
     console.log(`Player earned ${earnedMoney} money. Total money: ${base.money}`);
+
+    // Oblicz liczbę gwiazdek na podstawie zdrowia gracza
+    let stars = 0;
+    const healthPercentage = (player.health / base.health) * 100;
+
+    if (healthPercentage > 66) {
+        stars = 3;
+    } else if (healthPercentage > 33) {
+        stars = 2;
+    } else {
+        stars = 1;
+    }
+
+    totalStars += stars;
+
+    // Wyświetl gwiazdki na ekranie poziomu ukończonego
+    const starsContainer = document.getElementById('stars-container');
+    starsContainer.innerHTML = '';
+
+    for (let i = 0; i < stars; i++) {
+        const starImage = document.createElement('img');
+        starImage.src = '/star.png';
+        starImage.alt = 'Star';
+        starImage.style.width = '50px';
+        starImage.style.margin = '5px';
+        starsContainer.appendChild(starImage);
+    }
 
     levelCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
