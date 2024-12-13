@@ -18,9 +18,10 @@ const newElement = document.getElementById('new');
 const bonusLevelInfo = document.getElementById("bonusLevelInfo")
 
 let spawnInterval;
-const base = addPlayer()
 const tower = addTower();
 tower.loadModel()
+export const base = addPlayer()
+export let currentLevelIndex;
 
 // Lista poziomów gry
 export function getLevels(){
@@ -72,8 +73,6 @@ export function getLevels(){
     return levels;
 }
 
-export let currentLevelIndex;
-
 export function handleLevels(level, currentLevel, player, opponents, controls, scene){
     currentLevelIndex = level;
     // Rozpoczęcie poziomu
@@ -119,8 +118,8 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
     if (currentLevel == 4){
         // scene.fog = new THREE.Fog( 0xcccccc, 10, 150 );
     }
-     // Usunięcie wieży na dodatkowy poziom
-     if (currentLevel == 5){
+    // Usunięcie wieży na dodatkowy poziom
+    if (currentLevel == 5){
         scene.remove(tower.model)
         tower.projectiles.forEach(projectile => {
             scene.remove(projectile)
@@ -233,8 +232,4 @@ export function gameCompleted(level, player, opponents, scene, renderer) {
         gameCompletedScreen.style.display = 'none';
         level.started = false
     });
-}
-
-export function basePlayer(){
-    return base;
 }

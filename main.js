@@ -133,7 +133,6 @@ function animate() {
                 gameCompleted(level, player, opponents, scene, renderer);
             else{
                 // Zmiana poziomu na kolejny
-                level = levels[currentLevel]
                 levelCompleted(scene, player, renderer, opponents, level)
             }
         }

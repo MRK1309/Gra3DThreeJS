@@ -1,4 +1,4 @@
-import { basePlayer } from './levels';
+import { base } from './levels';
 
 // Plansza początkowa
 const blocker = document.getElementById('blocker');
@@ -99,7 +99,7 @@ function updateOponnentsCounter(level){
 
 export function updateInterface(player, level, controls){
     // Aktualizacja wszelkich pasków
-    updateBars(player.shootCount, player.fuel, player.health, basePlayer());
+    updateBars(player.shootCount, player.fuel, player.health, base);
 
     // Aktualizacja ikonek rakiet
     updateRocketIcons(player.availableRockets)
