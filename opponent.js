@@ -210,7 +210,7 @@ export function addOpponent(){
     return opponent;
 }
 
-export function createOpponents(numberOfOpponents, opponents, player, controls, scene, time, damage){
+export function createOpponents(numberOfOpponents, opponents, player, controls, scene, time, damage, currentLevel=0){
     let createdOpponents = 0;
 
     const interval = setInterval(() => {
@@ -223,13 +223,13 @@ export function createOpponents(numberOfOpponents, opponents, player, controls, 
             const opponent = addOpponent();
 
             // Jeśli to poziom 5, to stwórz kamikaze
-            if (numberOfOpponents == 7){
-                if ([1, 3, 5].includes(createdOpponents)){
+            if (currentLevel == 4){
+                if ((createdOpponents+1) % 2 == 0){
                     opponent.type = "kamikaze"
                     opponent.speed = 0.4;
                 }
             }
-            if (numberOfOpponents == Infinity){
+            if (currentLevel == 5){
                 if ((createdOpponents+1) % 5 == 0){
                     opponent.type = "kamikaze"
                     opponent.speed = 0.4;

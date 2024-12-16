@@ -80,7 +80,7 @@ export function handleLevels(level, currentLevel, player, opponents, controls, s
     if(level.started == false){
         level.started = true
         createOpponents(1, opponents, player, controls, scene, 0, level.damage)
-        spawnInterval = createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage)
+        spawnInterval = createOpponents(level.numberOfOpponents, opponents, player, controls, scene, level.spawnTime, level.damage, currentLevel)
 
         // Wyświetlenie informacji o zmianach w poziomie
         if (controls.isLocked){
