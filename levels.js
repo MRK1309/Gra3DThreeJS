@@ -252,6 +252,7 @@ export function gameCompleted(level, player, opponents, scene, renderer) {
     gameCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
 
+    const menuButton = document.getElementById('menu2');
     menuButton.addEventListener('click', () => {
         location.reload();
     });
