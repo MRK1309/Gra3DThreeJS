@@ -154,16 +154,7 @@ function cleanLevel(player, opponents, scene){
     scene.add(player.model);
 }
 
-// Funkcja wyświetlająca ekran "Level Completed"
-export function levelCompleted(scene, player, renderer, opponents, level) {
-    level.started = true;
-    scene.remove(player.model);
-
-    // Oblicz zarobione pieniądze
-    const earnedMoney = player.health * 10;
-    base.money += earnedMoney; // Aktualizacja pieniędzy gracza
-    console.log(`Player earned ${earnedMoney} money. Total money: ${base.money}`);
-
+function calculateStars(player, starsContainer){
     // Oblicz liczbę gwiazdek na podstawie zdrowia gracza
     let stars = 0;
     const healthPercentage = (player.health / base.health) * 100;
@@ -178,8 +169,7 @@ export function levelCompleted(scene, player, renderer, opponents, level) {
 
     totalStars += stars;
 
-    // Wyświetl gwiazdki na ekranie poziomu ukończonego
-    const starsContainer = document.getElementById('stars-container');
+    // Wyświetl gwiazdki na ekranie poziomu ukończonego=
     starsContainer.innerHTML = '';
 
     for (let i = 0; i < stars; i++) {
@@ -190,6 +180,21 @@ export function levelCompleted(scene, player, renderer, opponents, level) {
         starImage.style.margin = '5px';
         starsContainer.appendChild(starImage);
     }
+}
+
+// Funkcja wyświetlająca ekran "Level Completed"
+export function levelCompleted(scene, player, renderer, opponents, level) {
+    level.started = true;
+    scene.remove(player.model);
+
+    // Oblicz zarobione pieniądze
+    const earnedMoney = player.health * 10;
+    base.money += earnedMoney; // Aktualizacja pieniędzy gracza
+    console.log(`Player earned ${earnedMoney} money. Total money: ${base.money}`);
+
+    // Oblicz liczbę gwiazdek na podstawie zdrowia gracza
+    const starsContainer = document.getElementById('stars-container');
+    calculateStars(player, starsContainer)
 
     levelCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
@@ -251,6 +256,10 @@ export function gameCompleted(level, player, opponents, scene, renderer) {
     level.started = true
     gameCompletedScreen.style.display = 'block';
     cancelAnimationFrame(renderer.domElement);
+
+    // Oblicz liczbę gwiazdek na podstawie zdrowia gracza
+    const starsContainer = document.getElementById('stars-container2');
+    calculateStars(player, starsContainer)
 
     const menuButton = document.getElementById('menu2');
     menuButton.addEventListener('click', () => {
