@@ -265,6 +265,10 @@ export function gameCompleted(level, player, opponents, scene, renderer) {
     menuButton.addEventListener('click', () => {
         location.reload();
     });
+
+    if (totalStars == 3)
+        bonusLevelButton.style.display = "block"
+    
     bonusLevelButton.addEventListener('click', () => {
         cleanLevel(player, opponents, scene);
         gameCompletedScreen.style.display = 'none';
