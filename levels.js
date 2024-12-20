@@ -16,9 +16,11 @@ const bonusLevelButton = document.getElementById('bonusLevelButton');
 
 const newElement = document.getElementById('new');
 const bonusLevelInfo = document.getElementById("bonusLevelInfo")
+const destroyedOpponentsInfo = document.getElementById("destroyedOpponents")
 
 let spawnInterval;
 let totalStars = 0;
+let record = 0;
 const tower = addTower();
 tower.loadModel()
 export const base = addPlayer()
@@ -246,9 +248,19 @@ export function gameOver(scene, player, opponents, level, renderer) {
 
         gameOverScreen.style.display = 'none';
         
+        if (newRecord > record)
+            record = newRecord
     });
-    if(level.numberOfOpponents == Infinity)
+    
+    let newRecord = 0;
+    if(level.numberOfOpponents == Infinity){
         bonusLevelInfo.textContent = `Liczba zniszczonych przeciwników: ${level.destroyedOpponents}`;
+        destroyedOpponentsInfo.textContent = `Dotychczasowy rekord: ${record}`
+
+        if (level.destroyedOpponents > record){
+            newRecord  = level.destroyedOpponents
+        }
+    }
 }
 
 // Funkcja wyświetlająca ekran ukończenia gry

@@ -113,7 +113,7 @@ function animate() {
             }
             
             // Zliczanie zniszczonych przeciwników
-            if (opponent.health <= 0 && !opponent.isDestroyed) {
+            if (opponent.health <= 0 && !opponent.isDestroyed && player.health > 0 && player.fuel > 0) {
                 level.destroyedOpponents += 1;
                 opponent.isDestroyed = true;
                 console.log(level.destroyedOpponents);
@@ -125,7 +125,7 @@ function animate() {
             gameOver(scene, player, opponents, level, renderer);
 
         // Przejście poziomu
-        if (level.destroyedOpponents >= level.numberOfOpponents+1 && player.health > 0) {
+        if (level.destroyedOpponents >= level.numberOfOpponents+1 && player.health > 0 && player.fuel > 0) {
             currentLevel++;
             level = levels[currentLevel]
             // Ukończenie gry
