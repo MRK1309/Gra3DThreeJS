@@ -278,7 +278,7 @@ export function gameCompleted(level, player, opponents, scene, renderer) {
         location.reload();
     });
 
-    if (totalStars == 3)
+    if (totalStars / 5 == 3)
         bonusLevelButton.style.display = "block"
     
     bonusLevelButton.addEventListener('click', () => {
