@@ -129,6 +129,6 @@ export function store(base, player) {
 
 function updateMoneyDisplay(money) {
     if (playerMoneyDisplay) {
-        playerMoneyDisplay.textContent = `Money: ${money}`;
+        playerMoneyDisplay.textContent = `Środki: ${money}`;
     }
 }
