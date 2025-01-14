@@ -144,12 +144,11 @@ export function addOpponent(){
             const loader = new GLTFLoader();
 
             let url;
-            if (this.type == "kamikaze") url = '/ostateczny_kamikaze.glb';
-            else url = '/ostateczny_przeciwnik.glb';
+            if (this.type == "kamikaze") url = '/kamikaze.glb';
+            else url = '/przeciwnik.glb';
     
             loader.load(url, (gltf) => {
                 const opponentModel = gltf.scene;
-                // opponentModel.rotation.y = Math.PI;
                 opponentModel.rotation.y = Math.PI / 2;
                 
                 opponentModelcontainer.add(opponentModel);

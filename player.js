@@ -54,11 +54,10 @@ export function addPlayer(){
             const playerBoundingBox = new THREE.Box3();
             const loader = new GLTFLoader();
     
-            loader.load('/ostateczny_samolot.glb', (gltf) => {
+            loader.load('/samolot.glb', (gltf) => {
                 const model = gltf.scene;
                 modelContainer.add(model);
                 model.rotation.y = - Math.PI / 2;
-                // model.rotation.x = - Math.PI / 64;
         
                 playerBoundingBox.setFromObject(modelContainer);
             });
